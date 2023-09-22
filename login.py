@@ -1,14 +1,15 @@
+import tkinter
 from tkinter import *
 from tkinter import messagebox
-from PIL import ImageTk
+from PIL import Image, ImageTk
 
 def login():
     if usernameEntry.get()=='' or passwordEntry.get()=='':
         messagebox.showerror('Error', 'Fields can not be empty')
-    elif usernameEntry.get()=='RA4 concept' and passwordEntry.get()=='Abu':
+    elif usernameEntry.get()=='Alan P&S' and passwordEntry.get()=='Alan':
         messagebox.showinfo('Success', 'Welcome')
         window.destroy()
-        import sms
+        import main_page
     else:
         messagebox.showerror('Error', 'Enter correct credentials')
 
@@ -19,10 +20,12 @@ window.title('Login page')
 window.resizable(False, False)
 
 #Add background image
-backgroundImage = ImageTk.PhotoImage(file='images/keyboard.jpg')
-bgLabel = Label(window, image=backgroundImage)
-bgLabel.place(x=0, y=0)
+backgroundImage = Image.open('images/keyboard.jpg')
+global bgImage
+bgImage = ImageTk.PhotoImage(backgroundImage)
 
+bgLabel = Label(window, image=bgImage)
+bgLabel.place(x=0, y=0)
 
 loginFrame = Frame(window,bg='#c8dae0')
 loginFrame.place(x=400, y=150)
@@ -50,6 +53,5 @@ loginButton = Button(loginFrame,text='Login',font=('times new roman',14,'bold'),
                      fg='white',bg='cornflowerblue', activebackground='cornflowerblue',
                      activeforeground='white',cursor='hand2',command=login)
 loginButton.grid(row=3,column=1,pady=10)
-
 
 window.mainloop()
