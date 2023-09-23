@@ -268,6 +268,7 @@ root=ttkthemes.ThemedTk()
 root.get_themes()
 root.set_theme('radiance')
 
+root.iconbitmap('images/billing.ico')
 root.geometry('1174x700+0+0')
 root.title('Products')
 #root.resizable(False,False)
