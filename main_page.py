@@ -14,14 +14,15 @@ nameField = ['Product Id','Product Name','Brand Name','Retail Price','Wholesales
 
 con = sqlite3.connect('alan_pharm_supermarket.db')
 myCursor = con.cursor()
-query = 'CREATE TABLE IF NOT EXISTS products (productId int NOT NULL primary key,\
-                                    productName varchar(50) NOT NULL,\
-                                    brandName varchar(50) NOT NULL,\
-                                    retailPrice double NOT NULL,\
-                                    wholesalesPrice double NOT NULL,\
-                                    quantity int NOT NULL,\
-                                    expiryDate date NOT NULL,\
-                                    productCategory varchar(30) NOT NULL)'
+query = 'CREATE TABLE IF NOT EXISTS products (\
+                    productId int NOT NULL primary key,\
+                    productName varchar(50) NOT NULL,\
+                    brandName varchar(50) NOT NULL,\
+                    retailPrice double NOT NULL,\
+                    wholesalesPrice double NOT NULL,\
+                    quantity int NOT NULL,\
+                    expiryDate date NOT NULL,\
+                    productCategory varchar(30) NOT NULL)'
 myCursor.execute(query)
 
 #con.commit()
@@ -268,7 +269,6 @@ root=ttkthemes.ThemedTk()
 root.get_themes()
 root.set_theme('radiance')
 
-root.iconbitmap('images/billing.ico')
 root.geometry('1174x700+0+0')
 root.title('Products')
 #root.resizable(False,False)
