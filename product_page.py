@@ -9,27 +9,26 @@ import pandas
 count = 0
 txt = ''
 
-nameField = ['Product Id','Product Name','Brand Name','Retail Price','Wholesales Price',
+nameField = ['Product Id','Product Name','Retail Price','Wholesales Price',
              'Quantity','Expiry Date','Product Category']
 
 con = sqlite3.connect('alan_pharm_supermarket.db')
 myCursor = con.cursor()
 query = 'CREATE TABLE IF NOT EXISTS products (\
-                    productId int NOT NULL primary key,\
-                    productName varchar(50) NOT NULL,\
-                    brandName varchar(50) NOT NULL,\
-                    retailPrice double NOT NULL,\
-                    wholesalesPrice double NOT NULL,\
-                    quantity int NOT NULL,\
-                    expiryDate date NOT NULL,\
-                    productCategory varchar(30) NOT NULL)'
+                    productId INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\
+                    productName VARCHAR(50) NOT NULL,\
+                    retailPrice DOUBLE NOT NULL,\
+                    wholesalesPrice DOUBLE NOT NULL,\
+                    quantity INTEGER NOT NULL,\
+                    expiryDate DATE NOT NULL,\
+                    productCategory VARCHAR(15) NOT NULL)'
 myCursor.execute(query)
 
 #con.commit()
 #con.close()
 
 def toplevel_data(title,button_text,command):
-    global productId,productNameEntry,brandNameEntry,retailPriceEntry,wholesalesPriceEntry,\
+    global productId,productNameEntry,retailPriceEntry,wholesalesPriceEntry,\
         quantityEntry,expiryDateEntry,productCategoryEntry,entryWindow,indexing
     
     if title == 'Update Product':
@@ -41,52 +40,46 @@ def toplevel_data(title,button_text,command):
             entryWindow.resizable(False,False)
         
             productNameLabel = Label(entryWindow,text='Product Name',font=('times new roman',20,'bold'))
-            productNameLabel.grid(row=1,column=0,padx=30,pady=15,sticky=W)
+            productNameLabel.grid(row=0,column=0,padx=30,pady=15,sticky=W)
             productNameEntry = Entry(entryWindow,font=('roman',15,'bold'))
-            productNameEntry.grid(row=1,column=1,pady=15,padx=10)
-
-            brandNameLabel = Label(entryWindow,text='Brand Name',font=('times new roman',20,'bold'))
-            brandNameLabel.grid(row=2,column=0,padx=30,pady=15,sticky=W)
-            brandNameEntry = Entry(entryWindow,font=('roman',15,'bold'))
-            brandNameEntry.grid(row=2,column=1,pady=15,padx=10)
+            productNameEntry.grid(row=0,column=1,pady=15,padx=10)
 
             retailPriceLabel = Label(entryWindow,text='Retail Price',font=('times new roman',20,'bold'))
-            retailPriceLabel.grid(row=3,column=0,padx=30,pady=15,sticky=W)
+            retailPriceLabel.grid(row=1,column=0,padx=30,pady=15,sticky=W)
             retailPriceEntry = Entry(entryWindow,font=('roman',15,'bold'))
-            retailPriceEntry.grid(row=3,column=1,pady=15,padx=10)
+            retailPriceEntry.grid(row=1,column=1,pady=15,padx=10)
 
             wholesalesPriceLabel = Label(entryWindow,text='Wholesales Price',font=('times new roman',20,'bold'))
-            wholesalesPriceLabel.grid(row=4,column=0,padx=30,pady=15,sticky=W)
+            wholesalesPriceLabel.grid(row=2,column=0,padx=30,pady=15,sticky=W)
             wholesalesPriceEntry = Entry(entryWindow,font=('roman',15,'bold'))
-            wholesalesPriceEntry.grid(row=4,column=1,pady=15,padx=10)
+            wholesalesPriceEntry.grid(row=2,column=1,pady=15,padx=10)
 
             quantityLabel = Label(entryWindow,text='Quantity',font=('times new roman',20,'bold'))
-            quantityLabel.grid(row=5,column=0,padx=30,pady=15,sticky=W)
+            quantityLabel.grid(row=3,column=0,padx=30,pady=15,sticky=W)
             quantityEntry = Entry(entryWindow,font=('roman',15,'bold'))
-            quantityEntry.grid(row=5,column=1,pady=15,padx=10)
+            quantityEntry.grid(row=3,column=1,pady=15,padx=10)
 
             expiryDateLabel = Label(entryWindow,text='Expiry Date',font=('times new roman',20,'bold'))
-            expiryDateLabel.grid(row=6,column=0,padx=30,pady=15,sticky=W)
+            expiryDateLabel.grid(row=4,column=0,padx=30,pady=15,sticky=W)
             expiryDateEntry = Entry(entryWindow,font=('roman',15,'bold'))
-            expiryDateEntry.grid(row=6,column=1,pady=15,padx=10)
+            expiryDateEntry.grid(row=4,column=1,pady=15,padx=10)
 
             productCategoryLabel = Label(entryWindow,text='Product Category',font=('times new roman',20,'bold'))
-            productCategoryLabel.grid(row=7,column=0,padx=30,pady=15,sticky=W)
+            productCategoryLabel.grid(row=5,column=0,padx=30,pady=15,sticky=W)
             productCategoryEntry = Entry(entryWindow,font=('roman',15,'bold'))
-            productCategoryEntry.grid(row=7,column=1,pady=15,padx=10)
+            productCategoryEntry.grid(row=5,column=1,pady=15,padx=10)
 
             ProductButton = ttk.Button(entryWindow,text=button_text,command=command)
-            ProductButton.grid(row=8,columnspan=2,pady=10)
+            ProductButton.grid(row=6,columnspan=2,pady=10)
             content = productTable.item(indexing)
             listData = content['values']
             productId = listData[0]
             productNameEntry.insert(0,listData[1])
-            brandNameEntry.insert(0,listData[2])
-            retailPriceEntry.insert(0,listData[3])
-            wholesalesPriceEntry.insert(0,listData[4])
-            quantityEntry.insert(0,listData[5])
-            expiryDateEntry.insert(0,listData[6])
-            productCategoryEntry.insert(0,listData[7])
+            retailPriceEntry.insert(0,listData[2])
+            wholesalesPriceEntry.insert(0,listData[3])
+            quantityEntry.insert(0,listData[4])
+            expiryDateEntry.insert(0,listData[5])
+            productCategoryEntry.insert(0,listData[6])
         else:
             messagebox.showerror('Error', f'No product selected')
             return
@@ -98,47 +91,41 @@ def toplevel_data(title,button_text,command):
         entryWindow.resizable(False,False)
 
         productNameLabel = Label(entryWindow,text='Product Name',font=('times new roman',20,'bold'))
-        productNameLabel.grid(row=1,column=0,padx=30,pady=15,sticky=W)
+        productNameLabel.grid(row=0,column=0,padx=30,pady=15,sticky=W)
         productNameEntry = Entry(entryWindow,font=('roman',15,'bold'))
-        productNameEntry.grid(row=1,column=1,pady=15,padx=10)
-
-        brandNameLabel = Label(entryWindow,text='Brand Name',font=('times new roman',20,'bold'))
-        brandNameLabel.grid(row=2,column=0,padx=30,pady=15,sticky=W)
-        brandNameEntry = Entry(entryWindow,font=('roman',15,'bold'))
-        brandNameEntry.grid(row=2,column=1,pady=15,padx=10)
+        productNameEntry.grid(row=0,column=1,pady=15,padx=10)
 
         retailPriceLabel = Label(entryWindow,text='Retail Price',font=('times new roman',20,'bold'))
-        retailPriceLabel.grid(row=3,column=0,padx=30,pady=15,sticky=W)
+        retailPriceLabel.grid(row=1,column=0,padx=30,pady=15,sticky=W)
         retailPriceEntry = Entry(entryWindow,font=('roman',15,'bold'))
-        retailPriceEntry.grid(row=3,column=1,pady=15,padx=10)
+        retailPriceEntry.grid(row=1,column=1,pady=15,padx=10)
 
         wholesalesPriceLabel = Label(entryWindow,text='Wholesales Price',font=('times new roman',20,'bold'))
-        wholesalesPriceLabel.grid(row=4,column=0,padx=30,pady=15,sticky=W)
+        wholesalesPriceLabel.grid(row=2,column=0,padx=30,pady=15,sticky=W)
         wholesalesPriceEntry = Entry(entryWindow,font=('roman',15,'bold'))
-        wholesalesPriceEntry.grid(row=4,column=1,pady=15,padx=10)
+        wholesalesPriceEntry.grid(row=2,column=1,pady=15,padx=10)
 
         quantityLabel = Label(entryWindow,text='Quantity',font=('times new roman',20,'bold'))
-        quantityLabel.grid(row=5,column=0,padx=30,pady=15,sticky=W)
+        quantityLabel.grid(row=3,column=0,padx=30,pady=15,sticky=W)
         quantityEntry = Entry(entryWindow,font=('roman',15,'bold'))
-        quantityEntry.grid(row=5,column=1,pady=15,padx=10)
+        quantityEntry.grid(row=3,column=1,pady=15,padx=10)
 
         expiryDateLabel = Label(entryWindow,text='Expiry Date',font=('times new roman',20,'bold'))
-        expiryDateLabel.grid(row=6,column=0,padx=30,pady=15,sticky=W)
+        expiryDateLabel.grid(row=4,column=0,padx=30,pady=15,sticky=W)
         expiryDateEntry = Entry(entryWindow,font=('roman',15,'bold'))
-        expiryDateEntry.grid(row=6,column=1,pady=15,padx=10)
+        expiryDateEntry.grid(row=4,column=1,pady=15,padx=10)
 
         productCategoryLabel = Label(entryWindow,text='Product Category',font=('times new roman',20,'bold'))
-        productCategoryLabel.grid(row=7,column=0,padx=30,pady=15,sticky=W)
+        productCategoryLabel.grid(row=5,column=0,padx=30,pady=15,sticky=W)
         productCategoryEntry = Entry(entryWindow,font=('roman',15,'bold'))
-        productCategoryEntry.grid(row=7,column=1,pady=15,padx=10)
+        productCategoryEntry.grid(row=5,column=1,pady=15,padx=10)
 
         ProductButton = ttk.Button(entryWindow,text=button_text,command=command)
-        ProductButton.grid(row=8,columnspan=2,pady=10)
+        ProductButton.grid(row=6,columnspan=2,pady=10)
 
 def add_data():
-    if productNameEntry.get()=='' or brandNameEntry.get()=='' or retailPriceEntry.get()=='' or\
-    wholesalesPriceEntry.get()=='' or quantityEntry.get()=='' or expiryDateEntry.get()=='' or\
-    productCategoryEntry.get()=='':
+    if productNameEntry.get()=='' or retailPriceEntry.get()=='' or wholesalesPriceEntry.get()=='' \
+        or quantityEntry.get()=='' or expiryDateEntry.get()=='' or productCategoryEntry.get()=='':
         messagebox.showerror('Error','All fields are required',parent=entryWindow)
     else:
         try:
@@ -146,18 +133,16 @@ def add_data():
             myCursor.execute(query)
             max_id = myCursor.fetchone()[0]
             new_product_id = max_id + 1 if max_id else 1
-            
-            query = 'INSERT into products (productId, productName, brandName, retailPrice, wholesalesPrice, quantity, expiryDate, productCategory) \
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
-            myCursor.execute(query, (new_product_id, productNameEntry.get(), brandNameEntry.get(), retailPriceEntry.get(),
-                                    wholesalesPriceEntry.get(), quantityEntry.get(), expiryDateEntry.get(),
-                                    productCategoryEntry.get()))
+
+            query = 'INSERT into products (productId,productName,retailPrice,wholesalesPrice,quantity,expiryDate,\
+                productCategory) VALUES (?,?,?,?,?,?,?)'
+            myCursor.execute(query, (new_product_id,productNameEntry.get(),retailPriceEntry.get(),\
+                     wholesalesPriceEntry.get(), quantityEntry.get(), expiryDateEntry.get(),productCategoryEntry.get()))
             con.commit()
             
             result = messagebox.askyesno('Confirm','Data added successfully. Do you want to clean the form?')
             if result:
                 productNameEntry.delete(0, END)
-                brandNameEntry.delete(0, END)
                 retailPriceEntry.delete(0, END)
                 wholesalesPriceEntry.delete(0, END)
                 quantityEntry.delete(0, END)
@@ -172,9 +157,9 @@ def add_data():
         show_product()
             
 def search_data():
-    query = 'SELECT * FROM products where productName=? or brandName=? or retailPrice=? or wholesalesPrice=?\
-                or quantity=? or expiryDate=? or productCategory=?'
-    myCursor.execute(query,(productNameEntry.get(),brandNameEntry.get(),retailPriceEntry.get(),wholesalesPriceEntry.get(),\
+    query = 'SELECT * FROM products where productName=? or retailPrice=? or wholesalesPrice=? or quantity=? \
+            or expiryDate=? or productCategory=?'
+    myCursor.execute(query,(productNameEntry.get(),retailPriceEntry.get(),wholesalesPriceEntry.get(),\
                             quantityEntry.get(),expiryDateEntry.get(),productCategoryEntry.get()))
     productTable.delete(*productTable.get_children())
     fetchedData = myCursor.fetchall()
@@ -216,9 +201,9 @@ def show_product():
         productTable.insert('',END,values=data)
 
 def update_data():
-    query = 'update products set productName=?,brandName=?,retailPrice=?,wholesalesPrice=?,\
-                quantity=?,expiryDate=?,productCategory=? where productId=?'
-    myCursor.execute(query,(productNameEntry.get(),brandNameEntry.get(),retailPriceEntry.get(),wholesalesPriceEntry.get(),\
+    query = 'update products set productName=?,retailPrice=?,wholesalesPrice=?,quantity=?,expiryDate=? \
+            ,productCategory=? where productId=?'
+    myCursor.execute(query,(productNameEntry.get(),retailPriceEntry.get(),wholesalesPriceEntry.get(),\
                             quantityEntry.get(),expiryDateEntry.get(),productCategoryEntry.get(),productId))
     con.commit()
     messagebox.showinfo('Success',f'Product {productNameEntry.get()} is modified successfully',parent=entryWindow)
@@ -233,9 +218,8 @@ def export_data():
         content = productTable.item(index)
         dataList = content['values']
         newList.append(dataList)
-    table = pandas.DataFrame(newList,columns=['Product Id','Product Name','Brand Name',
-                                      'Retail Price','Wholesales Price','Quantity',
-                                      'Expiry Date','Product Category'])
+    table = pandas.DataFrame(newList,columns=['Product Id','Product Name','Retail Price','Wholesales Price','Quantity',
+                                                'Expiry Date','Product Category'])
     table.to_csv(url,index=False)
     messagebox.showinfo('Success','Data saved successfully')
 
@@ -319,7 +303,7 @@ rightFrame.place(x=350,y=80,width=1000,height=600)
 scrollBarX = Scrollbar(rightFrame,orient=HORIZONTAL)
 scrollBarY = Scrollbar(rightFrame,orient=VERTICAL)
 
-productTable = ttk.Treeview(rightFrame,columns=('Product Id','Product Name','Brand Name','Retail Price','Wholesales Price',
+productTable = ttk.Treeview(rightFrame,columns=('Product Id','Product Name','Retail Price','Wholesales Price',
                                 'Quantity','Expiry Date','Product Category'),
                             xscrollcommand=scrollBarX.set,yscrollcommand=scrollBarY.set)
 
@@ -337,7 +321,6 @@ productTable.config(show='headings')
 
 productTable.column('Product Id',width=100,anchor=CENTER)
 productTable.column('Product Name',width=300,anchor=CENTER)
-productTable.column('Brand Name',anchor=CENTER)
 productTable.column('Retail Price',anchor=CENTER)
 productTable.column('Wholesales Price',anchor=CENTER)
 productTable.column('Quantity',anchor=CENTER)

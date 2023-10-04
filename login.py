@@ -9,7 +9,7 @@ def login():
     elif usernameEntry.get()=='Alan P&S' and passwordEntry.get()=='Alan':
         messagebox.showinfo('Success', 'Welcome')
         window.destroy()
-        import main_page
+        import product_page
     else:
         messagebox.showerror('Error', 'Enter correct credentials')
 
