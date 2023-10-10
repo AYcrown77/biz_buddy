@@ -165,7 +165,6 @@ def search_data():
     fetchedData = myCursor.fetchall()
     if not fetchedData:
         messagebox.showerror('Error', f'No match')
-
     for data in fetchedData:
         productTable.insert('',END,values=data)
 
