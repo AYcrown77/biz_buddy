@@ -15,13 +15,13 @@ nameField = ['Product Id','Product Name','Retail Price','Wholesales Price',
 con = sqlite3.connect('alan_pharm_supermarket.db')
 myCursor = con.cursor()
 query = 'CREATE TABLE IF NOT EXISTS products (\
-                    productId INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\
-                    productName VARCHAR(50) NOT NULL,\
-                    retailPrice DOUBLE NOT NULL,\
-                    wholesalesPrice DOUBLE NOT NULL,\
-                    quantity INTEGER NOT NULL,\
-                    expiryDate DATE NOT NULL,\
-                    productCategory VARCHAR(15) NOT NULL)'
+            productId INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\
+            productName VARCHAR(50) NOT NULL,\
+            retailPrice DOUBLE NOT NULL,\
+            wholesalesPrice DOUBLE NOT NULL,\
+            quantity INTEGER NOT NULL,\
+            expiryDate DATE NOT NULL,\
+            productCategory VARCHAR(15) NOT NULL)'
 myCursor.execute(query)
 
 #con.commit()
@@ -153,7 +153,6 @@ def add_data():
         except:
             messagebox.showerror('Error','An error occurred while adding data',parent=entryWindow)
             return
-
         show_product()
             
 def search_data():
@@ -203,7 +202,7 @@ def update_data():
     query = 'update products set productName=?,retailPrice=?,wholesalesPrice=?,quantity=?,expiryDate=? \
             ,productCategory=? where productId=?'
     myCursor.execute(query,(productNameEntry.get(),retailPriceEntry.get(),wholesalesPriceEntry.get(),\
-                            quantityEntry.get(),expiryDateEntry.get(),productCategoryEntry.get(),productId))
+                        quantityEntry.get(),expiryDateEntry.get(),productCategoryEntry.get(),productId))
     con.commit()
     messagebox.showinfo('Success',f'Product {productNameEntry.get()} is modified successfully',parent=entryWindow)
     entryWindow.destroy()
