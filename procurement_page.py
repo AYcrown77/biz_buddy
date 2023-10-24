@@ -5,7 +5,7 @@ import sqlite3
 
 my_w = tk.Tk()
 my_w.geometry("560x450")  # Size of the window
-my_w.title("www.plus2net.com")  # Adding a title
+my_w.title("Procurement")  # Adding a title
 
 con = sqlite3.connect('alan_pharm_supermarket.db')
 myCursor = con.cursor()
@@ -40,7 +40,6 @@ def my_upd(*args):
     cb1["values"] = list(my_dict.values())
     l1.config(text="Number records : " + str(len(my_data)))
 
-
 def my_disp(*args):
     global p_id, p_name
     l1.config(text="")
@@ -50,7 +49,6 @@ def my_disp(*args):
             l1.config(text=" Product ID: " + str(i) + " \n Product: " + j)
             break
 
-
 def my_insert():
     global p_id, p_name
     query = "INSERT INTO product_purchase (p_id,product,price,qty,dt) \
@@ -58,16 +56,15 @@ def my_insert():
     data = (p_id, p_name, price_v.get(), quantity_v.get(), dt.entry.get())
     # print(query,my_data)
     id = myCursor.execute(query, data)
+    con.commit()
     l1.config(text="Data inserted ID: " + str(id.lastrowid), bootstyle="success")
     l1.after(3000, lambda: my_reset())
-
 
 def my_reset():
     cb1.delete(0, "end")
     price_v.set(0)
     quantity_v.set(1)
     l1.config(text="Ready", bootstyle="inverse-warning")
-
 
 font1 = ["Times", 50, "normal"]
 l_top = ttk.Label(
