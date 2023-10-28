@@ -8,7 +8,7 @@ import pandas
 #functionality part
 count = 0
 txt = ''
-
+date = time.strftime('%d/%m/%Y')
 nameField = ['expId','reason','amount','date']
 
 con = sqlite3.connect('alan_pharm_supermarket.db')
@@ -44,10 +44,10 @@ def toplevel_data(title,button_text,command):
             amountEntry = Entry(entryWindow,font=('roman',15,'bold'))
             amountEntry.grid(row=1,column=1,pady=15,padx=10)
 
-            dateLabel = Label(entryWindow,text='Date',font=('times new roman',20,'bold'))
-            dateLabel.grid(row=2,column=0,padx=30,pady=15,sticky=W)
-            dateEntry = Entry(entryWindow,font=('roman',15,'bold'))
-            dateEntry.grid(row=2,column=1,pady=15,padx=10)
+            #dateLabel = Label(entryWindow,text='Date',font=('times new roman',20,'bold'))
+            #dateLabel.grid(row=2,column=0,padx=30,pady=15,sticky=W)
+            #dateEntry = Entry(entryWindow,font=('roman',15,'bold'))
+            #dateEntry.grid(row=2,column=1,pady=15,padx=10)
 
             expButton = ttk.Button(entryWindow,text=button_text,command=command)
             expButton.grid(row=6,columnspan=2,pady=10)
@@ -57,7 +57,7 @@ def toplevel_data(title,button_text,command):
             expId = listData[0]
             reasonEntry.insert(0,listData[1])
             amountEntry.insert(0,listData[2])
-            dateEntry.insert(0,listData[3])
+            date = listData[3]
         else:
             messagebox.showerror('Error', f'No data selected')
             return
@@ -87,22 +87,22 @@ def toplevel_data(title,button_text,command):
         expButton.grid(row=6,columnspan=2,pady=10)
 
 def add_data():
-    if reasonEntry.get()=='' or amountEntry.get()=='' or dateEntry.get()=='':
+    if reasonEntry.get()=='' or amountEntry.get()=='': #or dateEntry.get()=='':
         messagebox.showerror('Error','All fields are required',parent=entryWindow)
     else:
         try:
-            query = 'SELECT MAX(supId) FROM expenses'
+            query = 'SELECT MAX(expId) FROM expenses'
             myCursor.execute(query)
             max_id = myCursor.fetchone()[0]
             new_expenses_id = max_id + 1 if max_id else 1
             query = 'INSERT into expenses (expId,reason,amount,date) VALUES (?,?,?,?)'
-            myCursor.execute(query,(new_expenses_id,reasonEntry.get(),amountEntry.get(),dateEntry.get()))
+            myCursor.execute(query,(new_expenses_id,reasonEntry.get(),amountEntry.get(),date))
             con.commit()
             result = messagebox.askyesno('Confirm','Data added successfully. Do you want to clean the form?')
             if result:
                 reasonEntry.delete(0, END)
                 amountEntry.delete(0, END)
-                dateEntry.delete(0, END)
+                #dateEntry.delete(0, END)
             else:
                 pass
         except:
@@ -112,7 +112,7 @@ def add_data():
             
 def search_data():
     query = 'SELECT * FROM expenses where reason=? or amount=? or date=?'
-    myCursor.execute(query,(reasonEntry.get(),amountEntry.get(),dateEntry.get()))
+    myCursor.execute(query,(reasonEntry.get(),amountEntry.get(),date))
     expensesTable.delete(*expensesTable.get_children())
     fetchedData = myCursor.fetchall()
     if not fetchedData:
@@ -153,7 +153,7 @@ def show_data():
 
 def update_data():
     query = 'UPDATE expenses SET reason=?,amount=?,date=? where expId=?'
-    myCursor.execute(query,(reasonEntry.get(),amountEntry.get(),dateEntry.get(),expId))
+    myCursor.execute(query,(reasonEntry.get(),amountEntry.get(),date,expId))
     con.commit()
     messagebox.showinfo('Success',f'Expenses is modified successfully',parent=entryWindow)
     entryWindow.destroy()
