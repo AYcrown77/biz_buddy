@@ -1,0 +1,16 @@
+	  **ALAN PHAMACEUTICALS(NIG) LTD.**
+    Opp. Iwo city hall, Ibadan road, Iwo, Osun state.
+		    08035896001
+
+Date: 02/11/2023 10:41:29
+Bill Number: 1
+Customer: Default
+Payment Method: Cash
+=======================================================
+Product				Qty		Price
+=======================================================
+Really Extra				1		200.0
+=======================================================
+												Total: #200.0
+
+		**Thanks for your patronage**
