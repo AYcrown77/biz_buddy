@@ -9,7 +9,7 @@ import pandas
 count = 0
 txt = ''
 
-nameField = ['custId','custName','phoneNo','address','paymentBal']
+nameField = ['Id','Name','Phone No','Address','Payment Balance']
 
 con = sqlite3.connect('alan_pharm_supermarket.db')
 myCursor = con.cursor()
@@ -191,6 +191,10 @@ def to_exit():
     else:
         pass
 
+def back():
+    root.destroy()
+    import main_page
+
 def slider():
     global txt, count
     if count == len(slide):
@@ -246,17 +250,20 @@ searchCustButton.grid(row=2,column=0,pady=10)
 updateCustButton = ttk.Button(leftFrame,text='Update Customer',width=20,command=lambda :toplevel_data('Update Customer','Update Customer',update_data))
 updateCustButton.grid(row=3,column=0,pady=10)
 
-showCustButton = ttk.Button(leftFrame,text='Show Supplier',width=20,command=show_data)
+showCustButton = ttk.Button(leftFrame,text='Show Customer',width=20,command=show_data)
 showCustButton.grid(row=4,column=0,pady=10)
 
 exportDataButton = ttk.Button(leftFrame,text='Export data',width=20,command=export_data)
 exportDataButton.grid(row=5,column=0,pady=10)
 
-deleteCustButton = ttk.Button(leftFrame,text='Delete Supplier',width=20,command=delete_data)
+deleteCustButton = ttk.Button(leftFrame,text='Delete Customer',width=20,command=delete_data)
 deleteCustButton.grid(row=6,column=0,pady=10)
 
 exitButton = ttk.Button(leftFrame,text='Exit',width=20,command=to_exit)
 exitButton.grid(row=7,column=0,pady=10)
+
+backButton = ttk.Button(leftFrame,text='Back',width=20,command=back)
+backButton.grid(row=8,column=0,pady=10)
 
 rightFrame = Frame(root)
 rightFrame.place(x=350,y=80,width=1000,height=600)
@@ -264,7 +271,7 @@ rightFrame.place(x=350,y=80,width=1000,height=600)
 scrollBarX = Scrollbar(rightFrame,orient=HORIZONTAL)
 scrollBarY = Scrollbar(rightFrame,orient=VERTICAL)
 
-customerTable = ttk.Treeview(rightFrame,columns=('custId','custName','phoneNo','address','paymentBal'),
+customerTable = ttk.Treeview(rightFrame,columns=('Id','Name','Phone No','Address','Payment Balance'),
                     xscrollcommand=scrollBarX.set,yscrollcommand=scrollBarY.set)
 
 scrollBarX.config(command=customerTable.xview)
@@ -279,11 +286,11 @@ for i in range(0, len(nameField)):
     customerTable.heading(nameField[i],text=nameField[i])
 customerTable.config(show='headings')
 
-customerTable.column('custId',width=100,anchor=CENTER)
-customerTable.column('custName',width=300,anchor=CENTER)
-customerTable.column('phoneNo',width=200,anchor=CENTER)
-customerTable.column('address',width=500,anchor=CENTER)
-customerTable.column('paymentBal',width=120,anchor=CENTER)
+customerTable.column('Id',width=100,anchor=CENTER)
+customerTable.column('Name',width=300,anchor=CENTER)
+customerTable.column('Phone No',width=200,anchor=CENTER)
+customerTable.column('Address',width=500,anchor=CENTER)
+customerTable.column('Payment Balance',width=200,anchor=CENTER)
 
 style = ttk.Style()
 style.configure('Treeview',rowheight=25,font=('arial',12,'bold'),

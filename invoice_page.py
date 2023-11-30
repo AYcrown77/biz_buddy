@@ -7,17 +7,20 @@ from  datetime import date
 import time
 import sqlite3
 import os,tempfile
-from invoice_products import my_dict,my_list
+from invoice_products import my_dict,my_list,cust_dict,cust_list
 import platform
 from tkcalendar import DateEntry
 
+global prc_ret
+prc_ret = 0
 con = sqlite3.connect('alan_pharm_supermarket.db')
 myCursor = con.cursor()
 query = '''
     CREATE TABLE IF NOT EXISTS invoice (
         inv_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
         total FLOAT NOT NULL,
-        date DATE NOT NULL
+        date DATE NOT NULL,
+        payment_method VARCHAR(50) NOT NULL
     );
     CREATE TABLE IF NOT EXISTS invoice_dtl (
         dtl_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -35,41 +38,20 @@ root = tk.Tk()
 root.title('Sales page')
 root.geometry('1200x670')
 root.iconphoto(False, tk.PhotoImage(file='images/billing.png'))
-font1 =['Times',16,'normal'] # font size and style 
+font1 = ['Times',16,'normal'] # font size and style 
 font2 = ['Times',22,'normal']
-headingLabel = Label(root,text='Retail Billing System',font=('times new roman',30,'bold')
+headingLabel = Label(root,text='Sales Management System',font=('times new roman',30,'bold')
                      ,bg='lime green',bd=12,relief=GROOVE)
 headingLabel.pack(fill=X,pady=1)
 
-customerDetailsFrame = LabelFrame(root,text='Customer Details',font=('times new roman',15,'bold')
-                                    ,bd=8,relief=GROOVE,bg='lime green')
-customerDetailsFrame.pack(fill=X)
-
-nameLabel = Label(customerDetailsFrame, text='Name',font=('times new roman',15,'bold')
-                  ,bg='lime green',fg='white')
-nameLabel.grid(row=0,column=0,padx=20)
-
-nameEntry = Entry(customerDetailsFrame,font=('arial',15),bd=4,width=18)
-nameEntry.grid(row=0,column=1,padx=8)
-nameEntry.insert(0,'Default')
-
-paymentLabel = Label(customerDetailsFrame, text='Payment Method',font=('times new roman',15,'bold')
-                  ,bg='lime green',fg='white')
-paymentLabel.grid(row=0,column=2,padx=20,pady=2)
-
-paymentEntry = Entry(customerDetailsFrame,font=('arial',15),bd=4,width=18)
-paymentEntry.grid(row=0,column=3,padx=8)
-
-billNumberLabel = Label(customerDetailsFrame, text='Bill No',font=('times new roman',15,'bold')
-                  ,bg='lime green',fg='white')
-billNumberLabel.grid(row=0,column=4,padx=20,pady=2)
-
-billNumberEntry = Entry(customerDetailsFrame,font=('arial',15),bd=4,width=18)
-billNumberEntry.grid(row=0,column=5,padx=8)
-
-searchButton = Button(customerDetailsFrame,text='SEARCH',
-                      font=('arial',12,'bold'),bd=3,width=10,command=lambda:search_bill())
-searchButton.grid(row=0,column=6,padx=20,pady=8)
+#functionality part of customer details frame
+def on_select(event):
+    # Get the current value in the combobox
+    current_value = name_cb.get()
+    # Filter the list of items based on the current input
+    filtered_items = [item for item in cust_list if current_value.lower() in item.lower()]
+    # Update the combobox with the filtered list
+    name_cb['values'] = filtered_items
 
 #functionality part of invoice/bill frame
 def clear_text():
@@ -115,7 +97,7 @@ def bill_area():
     currentTime = time.strftime('%H:%M:%S')
     textArea.delete(1.0,END)
     if total == 0:
-        messagebox.showerror('Error', 'No product purchased')
+        messagebox.showerror('Error','No product purchased')
     else:
         textArea.insert(END,'\t  **ALAN PHAMACEUTICALS(NIG) LTD.**')
         textArea.insert(END,'\n    Opp. Iwo city hall, Ibadan road, Iwo, Osun state.')
@@ -123,8 +105,8 @@ def bill_area():
         textArea.insert(END,'\n')
         textArea.insert(END,f'\nDate: {todayDate} {currentTime}')
         textArea.insert(END,f'\nBill Number: {billNumber}')
-        textArea.insert(END,'\nCustomer: Default')
-        textArea.insert(END,'\nPayment Method: Cash')
+        textArea.insert(END,f'\nCustomer: {name_cb.get()}')
+        textArea.insert(END,f'\nPayment Method: {paymentEntry.get()}')
         textArea.insert(END,'\n=======================================================')
         textArea.insert(END,'\nProduct\t\t\t\tQty\t\tPrice')
         textArea.insert(END,'\n=======================================================')
@@ -140,15 +122,188 @@ def bill_area():
 def save_bill():
     if not os.path.exists('bills'):
         os.mkdir('bills')
-    result = messagebox.askyesno('Confirm', 'Do you want to save the bill?' )
+    result = messagebox.askyesno('Confirm','Do you want to save the bill?' )
     if result:
         bill_content = textArea.get(1.0,END)
-        file = open(f'bills/ {billNumber}.txt', 'w')
+        file = open(f'bills/{billNumber}.txt','w')
         file.write(bill_content)
         file.close()
         messagebox.showinfo('Success', f'Bill number {billNumber} saved succefully')
 
-#Invoice frame
+#functionality part of product and treeview frame
+def my_select(event):
+    # Get the current value in the combobox
+    current_value = cb_product.get()
+    # Filter the list of items based on the current input
+    filtered_items = [item for item in my_list if current_value.lower() in item.lower()]
+    # Update the combobox with the filtered list
+    cb_product['values'] = filtered_items
+
+#def on_click_price(event):
+#       cb_price.set()
+
+def my_price(*args):  # *args is used to pass any number of arguments
+    #l1.config(text="")  # Clear the label
+    global p_id, val
+    p_id = 0 # If product is not selected from the options then id is 0
+    for i, j in my_dict.items():  # Loop through the dictionary
+        if j[1] == product.get():  # match the product name
+            prc.set(j[2])
+            both = []
+            prc1 = j[2]
+            prc2 = j[3]
+            both = [prc1, prc2]
+            cb_price['values'] = both
+            p_id = j[0]  # Product id is collected
+
+def my_add():
+    global iid, p_id
+    iid = iid+1  # Serial number to display 
+    total = round(qty.get()*prc.get(),2) # row wise total 
+    trv.insert("", 'end',iid=iid, values =(iid,product.get(),qty.get(),prc.get(),total))
+    my_upd(trv)
+
+def my_upd(trv):
+    global total 
+    total,sub_total = 0,0
+    for child in trv.get_children():
+        sub_total = round(sub_total+float(trv.item(child)["values"][4]),2)
+    l6.config(text=str(sub_total)) # shows sub total 
+    #tax=round(0.1*sub_total,2)  # 10 % tax rate, update here
+    #l8.config(text=str(tax))  # tax amount is displayed 
+    total=round(sub_total,2) #total 
+    l10.config(text=str(total))  # Final price is displayed
+    product.set('') # reset the combobox 
+    qty.set(1)  # reset quantity to 1
+    prc.set(0.0) # reset price to 0.0 
+
+def my_delete(self):
+    b2.config(state='active') # Delete button is active now 
+
+def data_delete():
+    try:
+        p_id = trv.selection()[0] # collect selected row id
+        trv.delete(p_id)  # remove the selected row from Treeview
+        b2['state'] = 'disabled' # disable the button 
+        my_upd(trv) # Update the total 
+    except Exception as e:
+        messagebox.showerror('Error', f'No product selected')
+
+def my_reset():
+    for item in trv.get_children():
+        trv.delete(item) # remove row 
+    global total
+    total = 0
+    product.set('') # reset combobox
+    qty.set(1) # Update quantity to 1 
+    prc.set(0.0) # Update price to 0.0
+    l6.config(text='0')  # Update display sub total
+    #l8.config(text='0')  # Update display for tax
+    l10.config(text='0') # Update display for total
+
+def insert_data():
+    global total, inv_id, id, pay_mtd
+    pay_mtd = paymentEntry.get()
+    dt = date.today() # Today's date
+    data = (total,dt,pay_mtd) # Data for parameterized query
+    query = "INSERT INTO invoice (total,date,payment_method) VALUES(?,?,?)"
+    id = myCursor.execute(query,data)
+    con.commit()
+    inv_id = id.lastrowid # get the bill or invoice number after adding data
+    query = "INSERT INTO invoice_dtl (inv_id,p_id,product,qty,price) \
+                VALUES(?,?,?,?,?)"
+    my_data = [] # list to store multiple rows of data
+
+    # In all rows invoice id is same
+    for line in trv.get_children():
+        my_list = trv.item(line)['values']
+        my_data.append([inv_id,my_list[1],my_list[2],my_list[3],my_list[4]])
+
+    i = 0
+    for datum in my_data:
+        myCursor.execute(query,datum)# adding list of products to table
+        con.commit()
+        i = i + 1
+    #print("Rows Added  = ",id.rowcount)
+    l_msg.config(text='Bill No:'+str(inv_id)+', Products:'+str(i))
+    l_msg.after(3000, lambda: l_msg.config(text=''))
+    bill_area() # generate bill
+    my_reset() # reset function
+    name_cb.set('Default')
+
+def sales_report():
+    popSales = Toplevel()
+    popSales.title('Sales report')
+    popSales.grab_set()
+    #popSales.geometry("700x500")
+    popSales.resizable(False,False)
+    sel=tk.StringVar()
+    prompt = Label(popSales,text='Choose Date',font=('times new roman',20,'bold'))
+    prompt.grid(row=0,column=0,padx=30,pady=15,sticky=W)
+    cal=DateEntry(popSales,selectmode='day',textvariable=sel)
+    cal.grid(row=0,column=1,padx=20,pady=30)
+
+    def updte(*args): # triggered when value of string varaible changes
+        sales = []
+        if(len(sel.get())>4):
+            dt=cal.get_date() # get selected date object from calendar
+            dt1=dt.strftime("%Y-%m-%d") #format for MySQL date column 
+            dt2=dt.strftime("%d-%B-%Y") #format to display at label 
+            l1.config(text=dt2) # display date at Label
+            query="SELECT total from invoice WHERE date=?"
+            sales = con.execute(query,(dt1,)) # execute query with data
+            total_sales = 0
+            for sale in sales:
+                total_sales = round((total_sales + int(sale[0])), 2)
+            l2.config(text="Total Sales: " + str(total_sales)) # show total value
+    sel.trace('w',updte)
+    l1=tk.Label(popSales,font=('Times',22,'bold'),fg='blue')
+    l1.grid(row=1,column=0)
+    l2=tk.Label(popSales,font=('Times',22,'bold'),fg='red')
+    l2.grid(row=2,column=0)
+
+def back():
+    root.destroy()
+    import main_page
+
+#=================================================================================================================
+
+#Customer details frame
+customerDetailsFrame = LabelFrame(root,text='Customer Details',font=('times new roman',15,'bold')
+                        ,bd=8,relief=GROOVE,bg='lime green')
+customerDetailsFrame.pack(fill=X)
+
+nameLabel = Label(customerDetailsFrame, text='Name',font=('times new roman',15,'bold')
+                  ,bg='lime green',fg='white')
+nameLabel.grid(row=0,column=0,padx=20)
+
+# Variable to store the current value in the combobox
+current_value = tk.StringVar()
+
+name_cb = ttk.Combobox(customerDetailsFrame,values=cust_list,textvariable=current_value,width=20,font=('arial',15))
+name_cb.grid(row=0,column=1,padx=8)
+name_cb.insert(0,'Default')
+name_cb.bind('<KeyRelease>', on_select)
+
+paymentLabel = Label(customerDetailsFrame, text='Payment Method',font=('times new roman',15,'bold')
+                  ,bg='lime green',fg='white')
+paymentLabel.grid(row=0,column=2,padx=20,pady=2)
+
+paymentEntry = ttk.Combobox(customerDetailsFrame, values=['Cash','POS','Cheque'],textvariable='',width=20,font=('arial',15))
+paymentEntry.grid(row=0,column=3,padx=8)
+
+billNumberLabel = Label(customerDetailsFrame, text='Bill No',font=('times new roman',15,'bold')
+                  ,bg='lime green',fg='white')
+billNumberLabel.grid(row=0,column=4,padx=20,pady=2)
+
+billNumberEntry = Entry(customerDetailsFrame,font=('arial',15),bd=2,width=18)
+billNumberEntry.grid(row=0,column=5,padx=8)
+
+searchButton = Button(customerDetailsFrame,text='SEARCH',
+                      font=('arial',12,'bold'),bd=3,width=10,command=lambda:search_bill())
+searchButton.grid(row=0,column=6,padx=20,pady=8)
+
+#Bill area frame
 rightFrame = Frame(root,bd=8,relief=GROOVE)
 rightFrame.place(x=800,y=160,width=500,height=550)
 
@@ -186,28 +341,30 @@ clearButton.grid(row=0,column=2,pady=5,padx=5)
 
 #Product display frame in treeview
 leftFrame = Frame(root)
-leftFrame.place(x=20,y=160,width=700,height=700)
+leftFrame.place(x=20,y=160,width=780,height=700)
 
 l1=tk.Label(leftFrame,text='Product',font=font1)
 l1.grid(row=0,column=0,padx=10,pady=5)
-
-product=tk.StringVar(leftFrame)
-cb_product = ttk.Combobox(leftFrame, values=my_list,textvariable=product,width=20)
+product=tk.StringVar()
+cb_product = ttk.Combobox(leftFrame,values=my_list,textvariable=product,width=30)
 cb_product.grid(row=0,column=1)
+cb_product.bind('<KeyRelease>', my_select)
+#cb_product.bind('<Button-1>', on_click)
+
 ##
 l2=tk.Label(leftFrame,text='Quantity',font=font1)
 l2.grid(row=0,column=2,padx=20,pady=10)
 qty=tk.IntVar(value=1)
-quantity = tk.Entry(leftFrame, textvariable=qty,width=5)
+quantity = tk.Entry(leftFrame,textvariable=qty,width=5)
 quantity.grid(row=0,column=3)
 ##
 l3=tk.Label(leftFrame,text='Price',font=font1)
 l3.grid(row=0,column=4,padx=20,pady=10)
 prc=tk.DoubleVar()
-price = tk.Entry(leftFrame,textvariable=prc,width=10)
-price.grid(row=0,column=5)
+cb_price = ttk.Combobox(leftFrame,textvariable=prc,width=10)
+cb_price.grid(row=0,column=5)
 ##
-b1=tk.Button(leftFrame,text='Add',font=14,command=lambda:my_add())
+b1=tk.Button(leftFrame,text='Add',font=('arial',12,'bold'),bg='lime green',command=lambda:my_add())
 b1.grid(row=0,column=6,padx=10)
 ##
 style = ttk.Style(leftFrame)
@@ -217,22 +374,22 @@ style.configure("Treeview", background="azure2",
 style.configure('Treeview.Heading', background="lime green") 
 # Using treeview widget
 trv = ttk.Treeview(leftFrame, selectmode ='browse')
-trv.grid(row=1,column=0,columnspan=7,rowspan=2,padx=10,pady=2)
+trv.grid(columnspan=10,rowspan=2,padx=10,pady=2)
 # number of columns
-trv["columns"] = ("1","2","3","4","5","6")
+trv["columns"] = ("1","2","3","4","5")
 trv['show'] = 'headings'
-trv.column("1", width = 40, anchor ='c') # width & alignment
-trv.column("2", width=40, anchor="w")
-trv.column("3", width = 250, anchor ='c')
-trv.column("4", width = 70, anchor ='c')
-trv.column("5", width = 90, anchor ='c')
-trv.column("6", width = 100, anchor ='c')
+trv.column("1", width = 50, anchor ='c') # width & alignment
+#trv.column("2", width=40, anchor="w")
+trv.column("2", width = 400, anchor ='c')
+trv.column("3", width = 80, anchor ='c')
+trv.column("4", width = 100, anchor ='c')
+trv.column("5", width = 100, anchor ='c')
 trv.heading("1", text ="Sl No") # Heading text
-trv.heading("2", text="p_id")  # Heading text
-trv.heading("3", text ="Product")
-trv.heading("4", text ="Quantity")
-trv.heading("5", text ="Rate")  
-trv.heading("6", text ="Total")
+#trv.heading("2", text="p_id")  # Heading text
+trv.heading("2", text ="Product")
+trv.heading("3", text ="Quantity")
+trv.heading("4", text ="Rate")  
+trv.heading("5", text ="Total")
 l5=tk.Label(leftFrame,text='Total :',fg='blue',font=font1,anchor='e')
 l5.grid(row=3,column=4)
 l6=tk.Label(leftFrame,text='0',fg='blue',font=font1,anchor='e')
@@ -246,130 +403,23 @@ l9.grid(row=4,column=4)
 l10=tk.Label(leftFrame,text='0',fg='red',font=font2,anchor='e')
 l10.grid(row=4,column=5,pady=20)
     
-b2=tk.Button(leftFrame,text='Delete',state='disabled',command=lambda:data_delete())
+b2=tk.Button(leftFrame,text='Delete',state='disabled',font=('arial',12,'bold'),bg='red',command=lambda:data_delete())
 b2.grid(row=3,column=1)
-b3=tk.Button(leftFrame,text='Del All',command=lambda:my_reset())
+b3=tk.Button(leftFrame,text='Del All',font=('arial',12,'bold'),bg='red',command=lambda:my_reset())
 b3.grid(row=3,column=2)
-b4=tk.Button(leftFrame,text='Confirm',font=font2,bg='lightyellow',command=lambda:insert_data())
+b4=tk.Button(leftFrame,text='Confirm',font=('arial',18,'bold'),bg='lime green',command=lambda:insert_data())
 b4.grid(row=5,column=2)
 l_msg=tk.Label(leftFrame,text='',fg='red',font=12)
 l_msg.grid(row=6,column=3,columnspan=2)
-b4=tk.Button(leftFrame,text='Sales Report',font=font2,bg='lightyellow',command=lambda:sales_report())
-b4.grid(row=7,columnspan=2)
+#billMenu,text='Print',font=('arial',16,'bold'),bg='lime green'
+#                     ,bd=5,width=8,pady=5,command=lambda:print_bill())
+b4=Button(leftFrame,text='Back',font=('arial',16,'bold'),bg='lime green',command=lambda:back())
+b4.grid(row=7,column=0)
+b4=Button(leftFrame,text='Sales Report',font=('arial',16,'bold'),bg='lime green',command=lambda:sales_report())
+b4.grid(row=7,column=1)
 total,iid,p_id=0,0,0
 
-#Add functionality
-def my_price(*args):  # *args is used to pass any number of arguments
-    l1.config(text="")  # Clear the label
-    global p_id
-    p_id=0 # If product is not selected from the options then id is 0 
-    for i, j in my_dict.items():  # Loop through the dictionary
-        if j[1] == product.get():  # match the product name
-            prc.set(j[2]) # price is collected. 
-            p_id=j[0]  # Product id is collected
-
-def my_add():
-    global iid, p_id
-    iid = iid+1  # Serial number to display 
-    total = round(qty.get()*prc.get(),2) # row wise total 
-    trv.insert("", 'end',iid=iid, values =(iid,p_id,product.get(),qty.get(),prc.get(),total))
-    my_upd(trv)
-
-def my_upd(trv):
-    global total 
-    total,sub_total = 0,0
-    for child in trv.get_children():
-        sub_total = round(sub_total+float(trv.item(child)["values"][5]),2)
-    l6.config(text=str(sub_total)) # shows sub total 
-    #tax=round(0.1*sub_total,2)  # 10 % tax rate, update here
-    #l8.config(text=str(tax))  # tax amount is displayed 
-    total=round(sub_total,2) # tax added to sub total 
-    l10.config(text=str(total))  # Final price is displayed
-    product.set('') # reset the combobox 
-    qty.set(1)  # reset quantity to 1
-    prc.set(0.0) # reset price to 0.0 
-
-def my_select(self):
-    b2.config(state='active') # Delete button is active now 
-
-def data_delete():
-    try:
-        p_id = trv.selection()[0] # collect selected row id
-        trv.delete(p_id)  # remove the selected row from Treeview
-        b2['state'] = 'disabled' # disable the button 
-        my_upd(trv) # Update the total 
-    except Exception as e:
-        messagebox.showerror('Error', f'No product selected')
-
-def my_reset():
-    for item in trv.get_children():
-        trv.delete(item) # remove row 
-    global total
-    total = 0
-    product.set('') # reset combobox
-    qty.set(1) # Update quantity to 1 
-    prc.set(0.0) # Update price to 0.0
-    l6.config(text='0')  # Update display sub total
-    #l8.config(text='0')  # Update display for tax
-    l10.config(text='0') # Update display for total
-
-def insert_data():
-    global total, inv_id, id
-    dt = date.today() # Today's date
-    data = (total,dt) # Data for parameterized query
-    query = "INSERT INTO invoice (total,date) VALUES(?,?)"
-    id = myCursor.execute(query,data)
-    con.commit()
-    inv_id = id.lastrowid # get the bill or invoice number after adding data
-    query = "INSERT INTO invoice_dtl (inv_id,p_id,product,qty,price) \
-                VALUES(?,?,?,?,?)"
-    my_data = [] # list to store multiple rows of data
-    # In all rows invoice id is same
-    for line in trv.get_children():
-        my_list = trv.item(line)['values']
-        my_data.append([inv_id,my_list[1],my_list[2],my_list[3],my_list[4]])
-    i = 0
-    for datum in my_data:
-        myCursor.execute(query,datum)# adding list of products to table
-        con.commit()
-        i = i + 1
-    #print("Rows Added  = ",id.rowcount)
-    l_msg.config(text='Bill No:'+str(inv_id)+', Products:'+str(i))
-    l_msg.after(3000, lambda: l_msg.config(text=''))
-    bill_area() # generate bill
-    my_reset() # reset function
-
-def sales_report():
-    popSales = Toplevel()
-    popSales.title('Sales report')
-    popSales.grab_set()
-    #popSales.geometry("700x500")
-    popSales.resizable(False,False)
-    sel=tk.StringVar()
-    prompt = Label(popSales,text='Choose Date',font=('times new roman',20,'bold'))
-    prompt.grid(row=0,column=0,padx=30,pady=15,sticky=W)
-    cal=DateEntry(popSales,selectmode='day',textvariable=sel)
-    cal.grid(row=0,column=1,padx=20,pady=30)
-    def updte(*args): # triggered when value of string varaible changes
-        sales = []
-        if(len(sel.get())>4):
-            dt=cal.get_date() # get selected date object from calendar
-            dt1=dt.strftime("%Y-%m-%d") #format for MySQL date column 
-            dt2=dt.strftime("%d-%B-%Y") #format to display at label 
-            l1.config(text=dt2) # display date at Label
-            query="SELECT total from invoice WHERE date=?"
-            sales = con.execute(query,(dt1,)) # execute query with data
-            total_sales = 0
-            for sale in sales:
-                total_sales = round((total_sales + int(sale[0])), 2)
-            l2.config(text="Total Sales: " + str(total_sales)) # show total value
-    sel.trace('w',updte)
-    l1=tk.Label(popSales,font=('Times',22,'bold'),fg='blue')
-    l1.grid(row=1,column=0)
-    l2=tk.Label(popSales,font=('Times',22,'bold'),fg='red')
-    l2.grid(row=2,column=0)
-
-trv.bind("<<TreeviewSelect>>", my_select)  # User selection of row
+trv.bind("<<TreeviewSelect>>", my_delete)  # User selection of row
 product.trace("w", my_price)  # Call the function on change
 
 root.mainloop()

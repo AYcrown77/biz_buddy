@@ -142,10 +142,10 @@ def save_bill():
     result = messagebox.askyesno('Confirm', 'Do you want to save the bill?')
     if result:
         bill_content = textArea.get(1.0,END)
-        file = open(f'procBills/ {procNumber}.txt', 'w')
+        file = open(f'procBills/{procNumber}.txt', 'w')
         file.write(bill_content)
         file.close()
-        messagebox.showinfo('Success', f'Bill number {procNumber} saved succefully')
+        messagebox.showinfo('Success', f'Proc number {procNumber} saved succefully')
 
 #Invoice frame
 rightFrame = Frame(root,bd=8,relief=GROOVE)
@@ -253,6 +253,8 @@ b4=tk.Button(leftFrame,text='Confirm',font=font2,bg='lightyellow',command=lambda
 b4.grid(row=5,column=2)
 l_msg=tk.Label(leftFrame,text='',fg='red',font=12)
 l_msg.grid(row=6,column=3,columnspan=2)
+b4=Button(leftFrame,text='Back',font=('arial',16,'bold'),bg='lime green',command=lambda:back())
+b4.grid(row=7,column=0)
 #b4=tk.Button(leftFrame,text='Sales Report',font=font2,bg='lightyellow',command=lambda:sales_report())
 #b4.grid(row=7,columnspan=2)
 total,iid,p_id=0,0,0
@@ -334,10 +336,13 @@ def insert_data():
         i = i + 1
     #print("Rows Added  = ",id.rowcount)
     l_msg.config(text='proc No:'+str(inv_id)+', Products:'+str(i))
-    l_msg.after(3000, lambda: l_msg.config(text=''))
+    l_msg.after(3000,lambda: l_msg.config(text=''))
     proc_area() # generate bill
     my_reset() # reset function
 
+def back():
+    root.destroy()
+    import main_page
 """
 def sales_report():
     popSales = Toplevel()

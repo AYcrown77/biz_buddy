@@ -178,6 +178,10 @@ def to_exit():
     else:
         pass
 
+def back():
+    root.destroy()
+    import main_page
+
 def slider():
     global txt, count
     if count == len(slide):
@@ -244,6 +248,9 @@ deleteexpButton.grid(row=6,column=0,pady=10)
 
 exitButton = ttk.Button(leftFrame,text='Exit',width=20,command=to_exit)
 exitButton.grid(row=7,column=0,pady=10)
+
+backButton = ttk.Button(leftFrame,text='Back',width=20,command=back)
+backButton.grid(row=8,column=0,pady=10)
 
 rightFrame = Frame(root)
 rightFrame.place(x=350,y=80,width=1000,height=600)
