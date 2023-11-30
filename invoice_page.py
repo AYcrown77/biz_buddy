@@ -11,8 +11,6 @@ from invoice_products import my_dict,my_list,cust_dict,cust_list
 import platform
 from tkcalendar import DateEntry
 
-global prc_ret
-prc_ret = 0
 con = sqlite3.connect('alan_pharm_supermarket.db')
 myCursor = con.cursor()
 query = '''
@@ -38,8 +36,9 @@ root = tk.Tk()
 root.title('Sales page')
 root.geometry('1200x670')
 root.iconphoto(False, tk.PhotoImage(file='images/billing.png'))
-font1 = ['Times',16,'normal'] # font size and style 
+font1 = ['Times',14,'normal'] # font size and style 
 font2 = ['Times',22,'normal']
+
 headingLabel = Label(root,text='Sales Management System',font=('times new roman',30,'bold')
                      ,bg='lime green',bd=12,relief=GROOVE)
 headingLabel.pack(fill=X,pady=1)
@@ -112,7 +111,7 @@ def bill_area():
         textArea.insert(END,'\n=======================================================')
         for line in trv.get_children():
             my_lst = trv.item(line)['values']
-            textArea.insert(END,f'\n{my_lst[2]}\t\t\t\t{my_lst[3]}\t\t{my_lst[5]}')
+            textArea.insert(END,f'\n{my_lst[0]}\t\t\t\t{my_lst[1]}\t\t{my_lst[3]}')
         textArea.insert(END,'\n=======================================================')
         textArea.insert(END,f'\n\t\t\t\t\t\t\t\t\t\t\t\tTotal: #{total}')
         #textArea.insert(END,'\n=======================================================')
@@ -142,9 +141,10 @@ def my_select(event):
 #def on_click_price(event):
 #       cb_price.set()
 
+#Get wholesales and retail price
 def my_price(*args):  # *args is used to pass any number of arguments
     #l1.config(text="")  # Clear the label
-    global p_id, val
+    global p_id
     p_id = 0 # If product is not selected from the options then id is 0
     for i, j in my_dict.items():  # Loop through the dictionary
         if j[1] == product.get():  # match the product name
@@ -156,34 +156,37 @@ def my_price(*args):  # *args is used to pass any number of arguments
             cb_price['values'] = both
             p_id = j[0]  # Product id is collected
 
+#Add new data to the treeview
 def my_add():
-    global iid, p_id
-    iid = iid+1  # Serial number to display 
     total = round(qty.get()*prc.get(),2) # row wise total 
-    trv.insert("", 'end',iid=iid, values =(iid,product.get(),qty.get(),prc.get(),total))
+    trv.insert("", 'end',values =(product.get(),qty.get(),prc.get(),total))
     my_upd(trv)
 
+#update treeview
 def my_upd(trv):
-    global total 
+    global total
     total,sub_total = 0,0
     for child in trv.get_children():
-        sub_total = round(sub_total+float(trv.item(child)["values"][4]),2)
+        sub_total = round(sub_total+float(trv.item(child)["values"][3]),2)
     l6.config(text=str(sub_total)) # shows sub total 
-    #tax=round(0.1*sub_total,2)  # 10 % tax rate, update here
-    #l8.config(text=str(tax))  # tax amount is displayed 
-    total=round(sub_total,2) #total 
+    outstanding_bal = round(0.1*sub_total,2)  # 10 % tax rate, update here
+    l8.config(text=str(outstanding_bal))  # tax amount is displayed 
+    total = round(sub_total,2) #total 
     l10.config(text=str(total))  # Final price is displayed
     product.set('') # reset the combobox 
     qty.set(1)  # reset quantity to 1
     prc.set(0.0) # reset price to 0.0 
 
+#Make the button inactive
 def my_delete(self):
     b2.config(state='active') # Delete button is active now 
 
 def data_delete():
     try:
-        p_id = trv.selection()[0] # collect selected row id
-        trv.delete(p_id)  # remove the selected row from Treeview
+        si_no = trv.selection()[0] # collect selected row id
+        trv.delete(si_no) # remove the selected row from Treeview
+        #p_id = trv.selection()[0] # collect selected row id
+        #trv.delete(p_id)  # remove the selected row from Treeview
         b2['state'] = 'disabled' # disable the button 
         my_upd(trv) # Update the total 
     except Exception as e:
@@ -198,11 +201,11 @@ def my_reset():
     qty.set(1) # Update quantity to 1 
     prc.set(0.0) # Update price to 0.0
     l6.config(text='0')  # Update display sub total
-    #l8.config(text='0')  # Update display for tax
+    l8.config(text='0')  # Update display for outstanding
     l10.config(text='0') # Update display for total
 
 def insert_data():
-    global total, inv_id, id, pay_mtd
+    global total, inv_id, id, pay_mtd, p_id
     pay_mtd = paymentEntry.get()
     dt = date.today() # Today's date
     data = (total,dt,pay_mtd) # Data for parameterized query
@@ -217,7 +220,8 @@ def insert_data():
     # In all rows invoice id is same
     for line in trv.get_children():
         my_list = trv.item(line)['values']
-        my_data.append([inv_id,my_list[1],my_list[2],my_list[3],my_list[4]])
+        #my_data.append([inv_id,my_list[1],my_list[2],my_list[3],my_list[4]])
+        my_data.append([inv_id,p_id,my_list[0],my_list[1],my_list[2]])
 
     i = 0
     for datum in my_data:
@@ -305,7 +309,7 @@ searchButton.grid(row=0,column=6,padx=20,pady=8)
 
 #Bill area frame
 rightFrame = Frame(root,bd=8,relief=GROOVE)
-rightFrame.place(x=800,y=160,width=500,height=550)
+rightFrame.place(x=850,y=160,width=500,height=550)
 
 billAreaLabel = Label(rightFrame,text='Bill Area',font=('times new roman',15,'bold'),bd=7,relief=GROOVE)
 billAreaLabel.pack(fill=X)
@@ -341,7 +345,7 @@ clearButton.grid(row=0,column=2,pady=5,padx=5)
 
 #Product display frame in treeview
 leftFrame = Frame(root)
-leftFrame.place(x=20,y=160,width=780,height=700)
+leftFrame.place(x=2,y=160,width=800,height=700)
 
 l1=tk.Label(leftFrame,text='Product',font=font1)
 l1.grid(row=0,column=0,padx=10,pady=5)
@@ -371,50 +375,61 @@ style = ttk.Style(leftFrame)
 style.theme_use("clam") # set theme to clam
 style.configure("Treeview", background="azure2", 
                 fieldbackground="lightyellow", foreground="black",font=font1)
-style.configure('Treeview.Heading', background="lime green") 
+style.configure('Treeview.Heading', background="lime green")
+
 # Using treeview widget
-trv = ttk.Treeview(leftFrame, selectmode ='browse')
+trv = ttk.Treeview(leftFrame,selectmode='browse')
+
 trv.grid(columnspan=10,rowspan=2,padx=10,pady=2)
+
+# Create vertical scrollbar
+vbar = ttk.Scrollbar(leftFrame, orient="vertical", command=trv.yview)
+vbar.grid(row=1, rowspan=3, column=6, sticky="ns")
+
+# Configure treeview to use the vertical scrollbar
+trv.configure(yscrollcommand=vbar.set)
 # number of columns
-trv["columns"] = ("1","2","3","4","5")
+trv["columns"] = ("1","2","3","4")
 trv['show'] = 'headings'
-trv.column("1", width = 50, anchor ='c') # width & alignment
+#trv.column("1", width = 40, anchor ='w') # width & alignment
 #trv.column("2", width=40, anchor="w")
-trv.column("2", width = 400, anchor ='c')
-trv.column("3", width = 80, anchor ='c')
-trv.column("4", width = 100, anchor ='c')
-trv.column("5", width = 100, anchor ='c')
-trv.heading("1", text ="Sl No") # Heading text
+trv.column("1", width = 450, anchor ='w')
+trv.column("2", width = 60, anchor ='w')
+trv.column("3", width = 100, anchor ='w')
+trv.column("4", width = 120, anchor ='w')
+#trv.heading("1", text ="Sl No") # Heading text
 #trv.heading("2", text="p_id")  # Heading text
-trv.heading("2", text ="Product")
-trv.heading("3", text ="Quantity")
-trv.heading("4", text ="Rate")  
-trv.heading("5", text ="Total")
-l5=tk.Label(leftFrame,text='Total :',fg='blue',font=font1,anchor='e')
-l5.grid(row=3,column=4)
-l6=tk.Label(leftFrame,text='0',fg='blue',font=font1,anchor='e')
-l6.grid(row=3,column=5)
-#l7=tk.Label(leftFrame,text='Tax 10 % :',fg='blue',font=font1,anchor='e')
-#l7.grid(row=4,column=4)
-#l8=tk.Label(leftFrame,text='0',fg='blue',font=font1,anchor='e')
-#l8.grid(row=4,column=5)
-l9=tk.Label(leftFrame,text='Total :',fg='red',font=font2,anchor='e')
-l9.grid(row=4,column=4)
+trv.heading("1", text ="Product")
+trv.heading("2", text ="Qty")
+trv.heading("3", text ="Rate")  
+trv.heading("4", text ="Total")
+
+#After treeview
+l5=tk.Label(leftFrame,text='Sub total:',fg='blue',font=font1)
+l5.grid(row=3,column=3)
+l6=tk.Label(leftFrame,text='0',fg='blue',font=font1)
+l6.grid(row=3,column=4)
+l7=tk.Label(leftFrame,text='Outstanding:',fg='blue',font=font1,anchor='e')
+l7.grid(row=4,column=3)
+l8=tk.Label(leftFrame,text='0',fg='blue',font=font1,anchor='e')
+l8.grid(row=4,column=4)
+l9=tk.Label(leftFrame,text='Total:',fg='red',font=font2,anchor='e')
+l9.grid(row=5,column=3)
 l10=tk.Label(leftFrame,text='0',fg='red',font=font2,anchor='e')
-l10.grid(row=4,column=5,pady=20)
+l10.grid(row=5,column=4)
     
 b2=tk.Button(leftFrame,text='Delete',state='disabled',font=('arial',12,'bold'),bg='red',command=lambda:data_delete())
-b2.grid(row=3,column=1)
-b3=tk.Button(leftFrame,text='Del All',font=('arial',12,'bold'),bg='red',command=lambda:my_reset())
-b3.grid(row=3,column=2)
-b4=tk.Button(leftFrame,text='Confirm',font=('arial',18,'bold'),bg='lime green',command=lambda:insert_data())
-b4.grid(row=5,column=2)
+b2.grid(row=3,column=0)
+b3=tk.Button(leftFrame,text='Del All',font=('arial',12,'bold'),bg='red',pady=5,padx=2,command=lambda:my_reset())
+b3.grid(row=3,column=1)
+b4=tk.Button(leftFrame,text='Confirm',font=('arial',18,'bold'),bg='lime green',pady=5,padx=1,command=lambda:insert_data())
+b4.grid(row=6,column=1,columnspan=2)
 l_msg=tk.Label(leftFrame,text='',fg='red',font=12)
 l_msg.grid(row=6,column=3,columnspan=2)
 #billMenu,text='Print',font=('arial',16,'bold'),bg='lime green'
 #                     ,bd=5,width=8,pady=5,command=lambda:print_bill())
 b4=Button(leftFrame,text='Back',font=('arial',16,'bold'),bg='lime green',command=lambda:back())
-b4.grid(row=7,column=0)
+b4.grid(row=7,column=0,pady=60,padx=5)
 b4=Button(leftFrame,text='Sales Report',font=('arial',16,'bold'),bg='lime green',command=lambda:sales_report())
 b4.grid(row=7,column=1)
 total,iid,p_id=0,0,0
