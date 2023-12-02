@@ -160,10 +160,13 @@ def my_price(*args):  # *args is used to pass any number of arguments
 
 #Add new data to the treeview
 def my_add():
-    total = round(qty.get()*prc.get(),2) # row wise total 
-    trv.insert("", 'end',values =(product.get(),qty.get(),prc.get(),total))
-    #change_qty()
-    my_upd(trv)
+    if cb_product.get() == '':
+        messagebox.showerror('Error','No product selected')
+    else:
+        total = round(qty.get()*prc.get(),2) # row wise total 
+        trv.insert("", 'end',values =(product.get(),qty.get(),prc.get(),total))
+        #change_qty()
+        my_upd(trv)
 
 #Change product quantity
 def change_qty():
@@ -257,7 +260,7 @@ def insert_data():
             myCursor.execute(query,datum)# adding list of products to table
             con.commit()
             i = i + 1
-        if paymentEntry.get == "":
+        if paymentEntry.get() == "":
             messagebox.showerror('Error','What is the payment method')
             #print("Rows Added  = ",id.rowcount)
         else:
