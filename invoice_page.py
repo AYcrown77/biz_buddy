@@ -31,7 +31,7 @@ query = '''
 '''
 
 myCursor.executescript(query)
-
+"""
 root = tk.Tk()
 root.title('Sales page')
 root.geometry('1200x670')
@@ -42,7 +42,7 @@ font2 = ['Times',22,'normal']
 headingLabel = Label(root,text='Sales Management System',font=('times new roman',30,'bold')
                      ,bg='lime green',bd=12,relief=GROOVE)
 headingLabel.pack(fill=X,pady=1)
-
+"""
 #functionality part of customer details frame
 def on_select(event):
     # Get the current value in the combobox
@@ -113,7 +113,9 @@ def bill_area():
             my_lst = trv.item(line)['values']
             textArea.insert(END,f'\n{my_lst[0]}\t\t\t\t{my_lst[1]}\t\t{my_lst[3]}')
         textArea.insert(END,'\n=======================================================')
-        textArea.insert(END,f'\n\t\t\t\t\t\t\t\t\t\t\t\tTotal: #{total}')
+        textArea.insert(END,f'\n\t\t\t\t\t\t\t\t\t\t\tSub total: #{sub_total:,}')
+        textArea.insert(END,f'\n\t\t\t\t\t\t\t\t\t\t\tOutstanding: #{outstanding_bal:,}')
+        textArea.insert(END,f'\n\t\t\t\t\t\t\t\t\t\t\tTOTAL: #{total:,}')
         #textArea.insert(END,'\n=======================================================')
         textArea.insert(END,'\n\n\t\t**Thanks for your patronage**')
         save_bill()
@@ -146,7 +148,7 @@ def my_price(*args):  # *args is used to pass any number of arguments
     #l1.config(text="")  # Clear the label
     global p_id
     p_id = 0 # If product is not selected from the options then id is 0
-    for i, j in my_dict.items():  # Loop through the dictionary
+    for i, j in my_dict.items():  # Loop through the dictionary of products
         if j[1] == product.get():  # match the product name
             prc.set(j[2])
             both = []
@@ -160,19 +162,44 @@ def my_price(*args):  # *args is used to pass any number of arguments
 def my_add():
     total = round(qty.get()*prc.get(),2) # row wise total 
     trv.insert("", 'end',values =(product.get(),qty.get(),prc.get(),total))
+    #change_qty()
     my_upd(trv)
+
+#Change product quantity
+def change_qty():
+    #for i, j in my_dict.items():  # Loop through the dictionary of products
+    #    if j[1] == product.get():
+    #        qty_in_stock = j[4] # get quantity from product table
+    for child in trv.get_children():
+        for i, j in my_dict.items():  # Loop through the dictionary of products
+            prod_name = trv.item(child)["values"][0]
+            if j[1] == prod_name:
+                qty_in_stock = j[4] # get quantity from product table
+        qty_bought = trv.item(child)["values"][1]
+        new_qty = int(qty_in_stock) - int(qty_bought) # Update product quantity
+        update_query = "UPDATE products SET quantity = ? WHERE productName = ?" # Execute the update query
+        myCursor.execute(update_query, (new_qty, prod_name))
+        # Commit the changes
+        con.commit()
+        #print(qty_in_stock)
 
 #update treeview
 def my_upd(trv):
-    global total
-    total,sub_total = 0,0
+    global total,sub_total,outstanding_bal
+    total,sub_total,outstanding_bal = 0,0,0
     for child in trv.get_children():
         sub_total = round(sub_total+float(trv.item(child)["values"][3]),2)
-    l6.config(text=str(sub_total)) # shows sub total 
-    outstanding_bal = round(0.1*sub_total,2)  # 10 % tax rate, update here
-    l8.config(text=str(outstanding_bal))  # tax amount is displayed 
-    total = round(sub_total,2) #total 
-    l10.config(text=str(total))  # Final price is displayed
+    #l6.config(text='#'+str(sub_total)) # shows sub total
+    l6.config(text='#'+f"{sub_total:,}") # shows sub total
+    for i, j in cust_dict.items():  # Loop through the dictionary
+        if j[1] == name_cb.get():
+            outstanding_bal = j[4]
+            break
+    l8.config(text='#'+f"{outstanding_bal:,}")
+    #outstanding_bal = round(0.1*sub_total,2)  # 10 % tax rate, update here
+    #l8.config(text=str(outstanding_bal))  # tax amount is displayed 
+    total = round(sub_total + outstanding_bal,2) #total 
+    l10.config(text='#'+f"{total:,}")  # Final amount is displayed
     product.set('') # reset the combobox 
     qty.set(1)  # reset quantity to 1
     prc.set(0.0) # reset price to 0.0 
@@ -222,7 +249,6 @@ def insert_data():
         my_list = trv.item(line)['values']
         #my_data.append([inv_id,my_list[1],my_list[2],my_list[3],my_list[4]])
         my_data.append([inv_id,p_id,my_list[0],my_list[1],my_list[2]])
-
     i = 0
     for datum in my_data:
         myCursor.execute(query,datum)# adding list of products to table
@@ -231,6 +257,7 @@ def insert_data():
     #print("Rows Added  = ",id.rowcount)
     l_msg.config(text='Bill No:'+str(inv_id)+', Products:'+str(i))
     l_msg.after(3000, lambda: l_msg.config(text=''))
+    change_qty()
     bill_area() # generate bill
     my_reset() # reset function
     name_cb.set('Default')
@@ -267,11 +294,22 @@ def sales_report():
     l2.grid(row=2,column=0)
 
 def back():
-    root.destroy()
-    import main_page
+        #root.withdraw()
+        root.destroy()
+        import main_page
 
 #=================================================================================================================
 
+root = tk.Tk()
+root.title('Sales page')
+root.geometry('1200x670')
+root.iconphoto(False, tk.PhotoImage(file='images/billing.png'))
+font1 = ['Times',14,'normal'] # font size and style 
+font2 = ['Times',22,'normal']
+
+headingLabel = Label(root,text='Sales Management System',font=('times new roman',30,'bold')
+                     ,bg='lime green',bd=12,relief=GROOVE)
+headingLabel.pack(fill=X,pady=1)
 #Customer details frame
 customerDetailsFrame = LabelFrame(root,text='Customer Details',font=('times new roman',15,'bold')
                         ,bd=8,relief=GROOVE,bg='lime green')
@@ -415,7 +453,7 @@ l8=tk.Label(leftFrame,text='0',fg='blue',font=font1,anchor='e')
 l8.grid(row=4,column=4)
 l9=tk.Label(leftFrame,text='Total:',fg='red',font=font2,anchor='e')
 l9.grid(row=5,column=3)
-l10=tk.Label(leftFrame,text='0',fg='red',font=font2,anchor='e')
+l10=tk.Label(leftFrame,text='0',fg='red',font=font1,anchor='e')
 l10.grid(row=5,column=4)
     
 b2=tk.Button(leftFrame,text='Delete',state='disabled',font=('arial',12,'bold'),bg='red',command=lambda:data_delete())
