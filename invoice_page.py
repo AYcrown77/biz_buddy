@@ -63,19 +63,19 @@ def print_bill():
     else:
         pfile=tempfile.mktemp('.txt')
         open(pfile,'w').write(textArea.get(1.0,END))
-    system_platform = platform.system()
-    if system_platform == "Windows":
-        try:
-            os.startfile(pfile, "print")
-        except AttributeError:
-            messagebox.showerror('Error','Printing not supported on this platform.')
-    elif system_platform == "Linux":
-        try:
-            subprocess.run(["lp", pfile])
-        except FileNotFoundError:
-            messagebox.showerror('Error',"Printing utility 'lp' not found. Please install it and try again.")
-    else:
-        messagebox.showerror('Error',f"Printing not supported on {system_platform}.")
+        system_platform = platform.system()
+        if system_platform == "Windows":
+            try:
+                os.startfile(pfile, "print")
+            except AttributeError:
+                messagebox.showerror('Error','Printing not supported on this platform.')
+        elif system_platform == "Linux":
+            try:
+                subprocess.run(["lp", pfile])
+            except FileNotFoundError:
+                messagebox.showerror('Error',"Printing utility 'lp' not found. Please install it and try again.")
+        else:
+            messagebox.showerror('Error',f"Printing not supported on {system_platform}.")
 
 def search_bill():
     for i in os.listdir('bills/'):
@@ -233,65 +233,104 @@ def my_reset():
 
 def insert_data():
     global total, inv_id, id, pay_mtd, p_id
-    pay_mtd = paymentEntry.get()
-    dt = date.today() # Today's date
-    data = (total,dt,pay_mtd) # Data for parameterized query
-    query = "INSERT INTO invoice (total,date,payment_method) VALUES(?,?,?)"
-    id = myCursor.execute(query,data)
-    con.commit()
-    inv_id = id.lastrowid # get the bill or invoice number after adding data
-    query = "INSERT INTO invoice_dtl (inv_id,p_id,product,qty,price) \
-                VALUES(?,?,?,?,?)"
-    my_data = [] # list to store multiple rows of data
-
-    # In all rows invoice id is same
-    for line in trv.get_children():
-        my_list = trv.item(line)['values']
-        #my_data.append([inv_id,my_list[1],my_list[2],my_list[3],my_list[4]])
-        my_data.append([inv_id,p_id,my_list[0],my_list[1],my_list[2]])
-    i = 0
-    for datum in my_data:
-        myCursor.execute(query,datum)# adding list of products to table
+    if total == 0:
+        messagebox.showerror('Error','No product purchased')
+    else:
+        pay_mtd = paymentEntry.get()
+        dt = date.today() # Today's date
+        data = (total,dt,pay_mtd) # Data for parameterized query
+        query = "INSERT INTO invoice (total,date,payment_method) VALUES(?,?,?)"
+        id = myCursor.execute(query,data)
         con.commit()
-        i = i + 1
-    #print("Rows Added  = ",id.rowcount)
-    l_msg.config(text='Bill No:'+str(inv_id)+', Products:'+str(i))
-    l_msg.after(3000, lambda: l_msg.config(text=''))
-    change_qty()
-    bill_area() # generate bill
-    my_reset() # reset function
-    name_cb.set('Default')
+        inv_id = id.lastrowid # get the bill or invoice number after adding data
+        query = "INSERT INTO invoice_dtl (inv_id,p_id,product,qty,price) \
+                    VALUES(?,?,?,?,?)"
+        my_data = [] # list to store multiple rows of data
+
+        # In all rows invoice id is same
+        for line in trv.get_children():
+            my_list = trv.item(line)['values']
+            #my_data.append([inv_id,my_list[1],my_list[2],my_list[3],my_list[4]])
+            my_data.append([inv_id,p_id,my_list[0],my_list[1],my_list[2]])
+        i = 0
+        for datum in my_data:
+            myCursor.execute(query,datum)# adding list of products to table
+            con.commit()
+            i = i + 1
+        if paymentEntry.get == "":
+            messagebox.showerror('Error','What is the payment method')
+            #print("Rows Added  = ",id.rowcount)
+        else:
+            l_msg.config(text='Bill No:'+str(inv_id)+', Products:'+str(i))
+            l_msg.after(3000, lambda: l_msg.config(text=''))
+            change_qty()
+            bill_area() # generate bill
+            my_reset() # reset function
+            name_cb.set('Default')
 
 def sales_report():
+    def updte(*args): # triggered when value of string varaible changes
+        sales = []
+        if(len(sel.get())>4):
+            total_sales,total_cash,total_pos,total_cheque = 0,0,0,0
+            dt = cal.get_date() # get selected date object from calendar
+            dt1 = dt.strftime("%Y-%m-%d") #format for MySQL date column 
+            dt2 = dt.strftime("%d-%B-%Y") #format to display at label
+            # Get total sales for the day
+            query_ts = "SELECT total from invoice WHERE date=?" #Query for total sales 
+            t_sales = con.execute(query_ts,(dt1,)) # execute query with data
+            for sale in t_sales:
+                total_sales = round((total_sales + int(sale[0])), 2)
+            # Get total cash for the day
+            query_tc = "SELECT total from invoice WHERE payment_method=? AND date=?" # Query for total cash 
+            t_cash = con.execute(query_tc,('Cash',dt1)) # execute query with data
+            for cash in t_cash:
+                total_cash = round((total_cash + int(cash[0])), 2)
+
+            # Get total pos for the day
+            query_tp = "SELECT total from invoice WHERE payment_method=? AND date=?" # Query for total pos 
+            t_pos = con.execute(query_tp,('POS',dt1)) # execute query with data
+            for pos in t_pos:
+                total_pos = round((total_pos + int(pos[0])), 2)
+
+            # Get total cheque for the day
+            query_ch = "SELECT total from invoice WHERE payment_method=? AND date=?" # Query for total cheque 
+            t_cheque = con.execute(query_ch,('Cheque',dt1)) # execute query with data
+            for cheque in t_cheque:
+                total_cheque = round((total_cheque + int(cheque[0])), 2)
+            
+            # Display the rigght values after date prompt
+            l1.config(text=dt2) # display date at Label
+            l2.config(text=f"Total Cash: #{total_cash:,}") # show total cash
+            l3.config(text=f"Total POS: #{total_pos:,}") # show total pos
+            l4.config(text=f"Total Cheque: #{total_cheque:,}") # show total cheque
+            l5.config(text="====================") # show total sales
+            l6.config(text=f"Total Sales: #{total_sales:,}") # show total sales
+    #Sales report window
     popSales = Toplevel()
     popSales.title('Sales report')
     popSales.grab_set()
     #popSales.geometry("700x500")
     popSales.resizable(False,False)
-    sel=tk.StringVar()
-    prompt = Label(popSales,text='Choose Date',font=('times new roman',20,'bold'))
+    sel = tk.StringVar()
+    prompt = Label(popSales,text='Choose Date',font=('times new roman',20,'bold')) # Select date for report
     prompt.grid(row=0,column=0,padx=30,pady=15,sticky=W)
     cal=DateEntry(popSales,selectmode='day',textvariable=sel)
     cal.grid(row=0,column=1,padx=20,pady=30)
+    sel.trace('w',updte) # Trigger update function
 
-    def updte(*args): # triggered when value of string varaible changes
-        sales = []
-        if(len(sel.get())>4):
-            dt=cal.get_date() # get selected date object from calendar
-            dt1=dt.strftime("%Y-%m-%d") #format for MySQL date column 
-            dt2=dt.strftime("%d-%B-%Y") #format to display at label 
-            l1.config(text=dt2) # display date at Label
-            query="SELECT total from invoice WHERE date=?"
-            sales = con.execute(query,(dt1,)) # execute query with data
-            total_sales = 0
-            for sale in sales:
-                total_sales = round((total_sales + int(sale[0])), 2)
-            l2.config(text="Total Sales: " + str(total_sales)) # show total value
-    sel.trace('w',updte)
-    l1=tk.Label(popSales,font=('Times',22,'bold'),fg='blue')
+    l1=tk.Label(popSales,font=('Times',22,'bold'),fg='blue') # date entered
     l1.grid(row=1,column=0)
-    l2=tk.Label(popSales,font=('Times',22,'bold'),fg='red')
+    l2=tk.Label(popSales,font=('Times',22,'bold'),fg='lime green') # Total sales
     l2.grid(row=2,column=0)
+    l3=tk.Label(popSales,font=('Times',22,'bold'),fg='lime green') # total cash
+    l3.grid(row=3,column=0)
+    l4=tk.Label(popSales,font=('Times',22,'bold'),fg='lime green') # total pos
+    l4.grid(row=4,column=0)
+    l5=tk.Label(popSales,font=('Times',22,'bold'),fg='black')
+    l5.grid(row=5,column=0)
+    l6=tk.Label(popSales,font=('Times',22,'bold'),fg='red')
+    l6.grid(row=6,column=0)
 
 def back():
         #root.withdraw()
