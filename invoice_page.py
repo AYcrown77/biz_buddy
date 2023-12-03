@@ -248,8 +248,8 @@ def insert_data():
         inv_id = id.lastrowid # get the bill or invoice number after adding data
         query = "INSERT INTO invoice_dtl (inv_id,p_id,product,qty,price) \
                     VALUES(?,?,?,?,?)"
+        # Get data from tree view
         my_data = [] # list to store multiple rows of data
-
         # In all rows invoice id is same
         for line in trv.get_children():
             my_list = trv.item(line)['values']
