@@ -1,6 +1,6 @@
 from tkinter import *
 import time
-import ttkthemes
+import tkinter as tk
 from tkinter import ttk,messagebox,filedialog
 import sqlite3
 import pandas
@@ -249,13 +249,14 @@ def clock():
     datetimeLabel.config(text=f'   Date: {date}\nTime: {currentTime}')
     datetimeLabel.after(1000, clock)
 
+
+#================================================================
 #Gui part
-root=ttkthemes.ThemedTk()
+root = tk.Tk()
+#root.get_themes()
+#root.set_theme('radiance')
 
-root.get_themes()
-root.set_theme('radiance')
-
-root.geometry('1174x700+0+0')
+root.geometry('1174x700')
 root.title('Products')
 #root.resizable(False,False)
 

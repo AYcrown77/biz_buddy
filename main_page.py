@@ -4,29 +4,17 @@ import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk
 
-root = tk.Tk()
 
-root.geometry('1360x750')
-root.title('Main page')
-root.resizable(False, False)
-
-#Add background image
-backgroundImage = Image.open('images/keyboard.jpg')
-global bgImage
-bgImage = ImageTk.PhotoImage(backgroundImage)
-
-bgLabel = Label(root, image=bgImage)
-bgLabel.place(x=0, y=0)
-
-# dictionary of colors:
-color = {"nero": "#252726", "lime green": "#32CD32", "darkorange": "#FE6101"}
-
-# setting switch state:
-btnState = False
-
-# loading Navbar icon image:
-navIcon = PhotoImage(file="images/menu.png")
-closeIcon = PhotoImage(file="images/close.png")
+#Login
+def login():
+    if usernameEntry.get()=='' or passwordEntry.get()=='':
+        messagebox.showerror('Error', 'Fields can not be empty')
+    elif usernameEntry.get()=='Alan Pharmacy' and passwordEntry.get()=='1234':
+        messagebox.showinfo('Success', 'Successful')
+        switch()
+        passwordEntry.delete(0, tk.END)
+    else:
+        messagebox.showerror('Error', 'Enter correct credentials')
 
 # setting switch function:
 def switch():
@@ -60,29 +48,52 @@ def switch():
         # turing button ON:
         btnState = True
 
-def invoice():
-    root.destroy()
-    import invoice_page
 
+def invoice():
+    import invoice_page
+    
 def inventory():
-    root.destroy()
     import product_page
 
-def procurement():
-    root.destroy()
+def procurement(root):
     import procurement_page
 
 def expenses():
-    root.destroy()
     import expenses_page
 
 def customer():
-    root.destroy()
     import customer_page
 
 def supplier():
-    root.destroy()
     import supplier_page
+
+#====================================================================================================
+
+root = tk.Tk()
+root.geometry('1360x750')
+root.title('Main page')
+root.resizable(False, False)
+#root.state('zoomed')
+#Add background image
+
+backgroundImage = Image.open('images/keyboard.jpg')
+
+global bgImage
+bgImage = ImageTk.PhotoImage(backgroundImage,  master=root)
+
+bgLabel = Label(root, image=bgImage)
+bgLabel.place(x=0, y=0)
+
+# dictionary of colors:
+color = {"nero": "#252726", "lime green": "#32CD32", "darkorange": "#FE6101"}
+
+# setting switch state:
+btnState = False
+
+# loading Navbar icon image:
+navIcon = PhotoImage(file="images/menu.png", master=root)
+closeIcon = PhotoImage(file="images/close.png", master=root)
+
 
 # top Navigation bar:
 topFrame = tk.Frame(root, bg=color["lime green"])
@@ -98,7 +109,7 @@ brandLabel.place(x=100, y=250)
 
 # Navbar button:
 navbarBtn = tk.Button(topFrame, image=navIcon, bg=color["lime green"], activebackground=color["lime green"],
-                      bd=0, padx=20)
+                    bd=0, padx=20)
 navbarBtn.place(x=10, y=10)
 
 # setting Navbar frame:
@@ -114,21 +125,21 @@ options = ["inventory", "Settings", "Help", "About", "Feedback"]
 # Navbar Option Buttons:
 for i in range(5):
     tk.Button(navRoot, text=options[i], font="BahnschriftLight 15", bg="gray17", fg=color["lime green"], activebackground="gray17",
-              activeforeground="green", bd=0).place(x=25, y=y)
+            activeforeground="green", bd=0).place(x=25, y=y)
     y += 40
 """
 invoiceButton = tk.Button(navRoot, text="Sales Management", font="BahnschriftLight 15", bg="gray17", fg=color["lime green"], activebackground="gray17",
-              activeforeground="green", bd=0, command=invoice).place(x=25, y=80)
+            activeforeground="green", bd=0, command=invoice).place(x=25, y=80)
 inventoryButton = tk.Button(navRoot, text="Inventory Management", font="BahnschriftLight 15", bg="gray17", fg=color["lime green"], activebackground="gray17",
-              activeforeground="green", bd=0, command=inventory).place(x=25, y=130)
+            activeforeground="green", bd=0, command=inventory).place(x=25, y=130)
 procurementButton = tk.Button(navRoot, text="Procurement Management", font="BahnschriftLight 15", bg="gray17", fg=color["lime green"], activebackground="gray17",
-              activeforeground="green", bd=0, command=procurement).place(x=25, y=180)
+            activeforeground="green", bd=0, command=procurement).place(x=25, y=180)
 expensesButton = tk.Button(navRoot, text="Expenses Management", font="BahnschriftLight 15", bg="gray17", fg=color["lime green"], activebackground="gray17",
-              activeforeground="green", bd=0, command=expenses).place(x=25, y=230)
+            activeforeground="green", bd=0, command=expenses).place(x=25, y=230)
 expensesButton = tk.Button(navRoot, text="Customer Management", font="BahnschriftLight 15", bg="gray17", fg=color["lime green"], activebackground="gray17",
-              activeforeground="green", bd=0, command=customer).place(x=25, y=280)
+            activeforeground="green", bd=0, command=customer).place(x=25, y=280)
 supplierButton = tk.Button(navRoot, text="Supplier Management", font="BahnschriftLight 15", bg="gray17", fg=color["lime green"], activebackground="gray17",
-              activeforeground="green", bd=0, command=supplier).place(x=25, y=330)
+            activeforeground="green", bd=0, command=supplier).place(x=25, y=330)
 
 # Navbar Close Button:
 closeBtn = tk.Button(navRoot, image=closeIcon, bg=color["lime green"], activebackground=color["lime green"], bd=0, command=switch)
@@ -136,15 +147,7 @@ closeBtn.place(x=250, y=10)
 
 #global username, password
 #username = 'Alan Pharmacy'
-def login():
-    if usernameEntry.get()=='' or passwordEntry.get()=='':
-        messagebox.showerror('Error', 'Fields can not be empty')
-    elif usernameEntry.get()=='Alan Pharmacy' and passwordEntry.get()=='1234':
-        messagebox.showinfo('Success', 'Successful')
-        switch()
-        passwordEntry.delete(0, tk.END)
-    else:
-        messagebox.showerror('Error', 'Enter correct credentials')
+
 """
 def change_password():
     entryWindow = Toplevel()
@@ -168,8 +171,8 @@ def change_password():
     confirmNewEntry.grid(row=2,column=1,pady=15,padx=10)
 
     ProductButton = Button(entryWindow,text='Confirm Change',font=('times new roman',14,'bold'),width=15,
-                     fg='white',bg='lime green', activebackground='cornflowerblue',
-                     activeforeground='white',cursor='hand2',command='')
+                    fg='white',bg='lime green', activebackground='cornflowerblue',
+                    activeforeground='white',cursor='hand2',command='')
     ProductButton.grid(row=3,columnspan=2,pady=10)
 
 def confirm_change():
@@ -185,19 +188,19 @@ def confirm_change():
 loginFrame = Frame(root,bg='#c8dae0')
 loginFrame.place(x=400, y=150)
 
-logoImage = PhotoImage(file='images/user.png')
+logoImage = PhotoImage(file='images/user.png', master=root)
 
 logoLabel = Label(loginFrame, image=logoImage)
 logoLabel.grid(row=0,column=0,columnspan=2,pady=10)
 
-usernameImage = PhotoImage(file='images/username.png')
+usernameImage = PhotoImage(file='images/username.png', master=root)
 usernameLabel = Label(loginFrame, image=usernameImage, text='Username', compound=LEFT,
                         font=('times new roman',20,'bold'),bg='#c8dae0')
 usernameLabel.grid(row=1,column=0,pady=10,padx=20)
 usernameEntry = Entry(loginFrame,font=('times new roman',20,'bold'),bd=2,fg='black')
 usernameEntry.grid(row=1,column=1,pady=10,padx=20)
 
-passwordImage = PhotoImage(file='images/padlock.png')
+passwordImage = PhotoImage(file='images/padlock.png',master=root)
 passwordLabel = Label(loginFrame, image=passwordImage, text='Password', compound=LEFT,
                         font=('times new roman',20,'bold'),bg='#c8dae0')
 passwordLabel.grid(row=2,column=0,pady=10,padx=20)
@@ -213,5 +216,6 @@ loginButton.grid(row=3,column=1,pady=10)
 #                    fg='white',bg='lime green', activebackground='cornflowerblue',
 #                    activeforeground='white',cursor='hand2',command=change_password)
 #changePasswordButton.grid(row=3,column=0,pady=10)
+
 
 root.mainloop()

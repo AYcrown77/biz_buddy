@@ -30,46 +30,6 @@ query = '''
 '''
 myCursor.executescript(query)
 
-root = tk.Tk()
-root.title('Procurement Page')
-root.geometry('1200x670')
-root.iconphoto(False, tk.PhotoImage(file='images/billing.png'))
-font1 =['Times',16,'normal'] # font size and style 
-font2 = ['Times',22,'normal']
-headingLabel = Label(root,text='Procurement System',font=('times new roman',30,'bold')
-                     ,bg='lime green',bd=12,relief=GROOVE)
-headingLabel.pack(fill=X,pady=1)
-
-distributorDetailsFrame = LabelFrame(root,text='Distributor Details',font=('times new roman',15,'bold')
-                                    ,bd=8,relief=GROOVE,bg='lime green')
-distributorDetailsFrame.pack(fill=X)
-
-nameLabel = Label(distributorDetailsFrame, text='Name',font=('times new roman',15,'bold')
-                  ,bg='lime green',fg='white')
-nameLabel.grid(row=0,column=0,padx=20)
-
-nameEntry = Entry(distributorDetailsFrame,font=('arial',15),bd=4,width=18)
-nameEntry.grid(row=0,column=1,padx=8)
-nameEntry.insert(0,'Default')
-
-paymentLabel = Label(distributorDetailsFrame, text='Payment Method',font=('times new roman',15,'bold')
-                  ,bg='lime green',fg='white')
-paymentLabel.grid(row=0,column=2,padx=20,pady=2)
-
-paymentEntry = Entry(distributorDetailsFrame,font=('arial',15),bd=4,width=18)
-paymentEntry.grid(row=0,column=3,padx=8)
-
-procNumberLabel = Label(distributorDetailsFrame, text='Proc No',font=('times new roman',15,'bold')
-                  ,bg='lime green',fg='white')
-procNumberLabel.grid(row=0,column=4,padx=20,pady=2)
-
-procNumberEntry = Entry(distributorDetailsFrame,font=('arial',15),bd=4,width=18)
-procNumberEntry.grid(row=0,column=5,padx=8)
-
-searchButton = Button(distributorDetailsFrame,text='SEARCH',
-                      font=('arial',12,'bold'),bd=3,width=10,command=lambda:search_proc())
-searchButton.grid(row=0,column=6,padx=20,pady=8)
-
 #functionality part of invoice/bill frame
 def clear_text():
     messagebox.askyesno('Confirm', 'Are you sure you want to clear text?')
@@ -146,6 +106,132 @@ def save_bill():
         file.write(bill_content)
         file.close()
         messagebox.showinfo('Success', f'Proc number {procNumber} saved succefully')
+
+#Add functionality
+def my_price(*args):  # *args is used to pass any number of arguments
+    l1.config(text="")  # Clear the label
+    global p_id
+    p_id=0 # If product is not selected from the options then id is 0 
+    for i, j in my_dict.items():  # Loop through the dictionary
+        if j[1] == product.get():  # match the product name
+            prc.set(j[2]) # price is collected. 
+            p_id=j[0]  # Product id is collected
+
+def my_add():
+    global iid, p_id
+    iid = iid+1  # Serial number to display 
+    total = round(qty.get()*prc.get(),2) # row wise total 
+    trv.insert("", 'end',iid=iid, values =(iid,p_id,product.get(),qty.get(),prc.get(),total))
+    my_upd(trv)
+
+def my_upd(trv):
+    global total 
+    total,sub_total = 0,0
+    for child in trv.get_children():
+        sub_total = round(sub_total+float(trv.item(child)["values"][5]),2)
+    l6.config(text=str(sub_total)) # shows sub total 
+    #tax=round(0.1*sub_total,2)  # 10 % tax rate, update here
+    #l8.config(text=str(tax))  # tax amount is displayed 
+    total=round(sub_total,2) # tax added to sub total 
+    l10.config(text=str(total))  # Final price is displayed
+    product.set('') # reset the combobox 
+    qty.set(1)  # reset quantity to 1
+    prc.set(0.0) # reset price to 0.0 
+
+def my_select(self):
+    b2.config(state='active') # Delete button is active now 
+
+def data_delete():
+    try:
+        p_id = trv.selection()[0] # collect selected row id
+        trv.delete(p_id)  # remove the selected row from Treeview
+        b2['state'] = 'disabled' # disable the button 
+        my_upd(trv) # Update the total 
+    except Exception as e:
+        messagebox.showerror('Error', f'No product selected')
+
+def my_reset():
+    for item in trv.get_children():
+        trv.delete(item) # remove row 
+    global total
+    total = 0
+    product.set('') # reset combobox
+    qty.set(1) # Update quantity to 1 
+    prc.set(0.0) # Update price to 0.0
+    l6.config(text='0')  # Update display sub total
+    #l8.config(text='0')  # Update display for tax
+    l10.config(text='0') # Update display for total
+
+def insert_data():
+    global total, inv_id, id
+    dt = date.today() # Today's date
+    data = (total,dt) # Data for parameterized query
+    query = "INSERT INTO procurement (total,date) VALUES(?,?)"
+    id = myCursor.execute(query,data)
+    con.commit()
+    inv_id = id.lastrowid # get the bill or invoice number after adding data
+    query = "INSERT INTO procurement_dtl (inv_id,p_id,product,qty,price) \
+                VALUES(?,?,?,?,?)"
+    my_data = [] # list to store multiple rows of data
+    # In all rows invoice id is same
+    for line in trv.get_children():
+        my_list = trv.item(line)['values']
+        my_data.append([inv_id,my_list[1],my_list[2],my_list[3],my_list[4]])
+    i = 0
+    for datum in my_data:
+        myCursor.execute(query,datum)# adding list of products to table
+        con.commit()
+        i = i + 1
+    #print("Rows Added  = ",id.rowcount)
+    l_msg.config(text='proc No:'+str(inv_id)+', Products:'+str(i))
+    l_msg.after(3000,lambda: l_msg.config(text=''))
+    proc_area() # generate bill
+    my_reset() # reset function
+
+def back():
+    root.destroy()
+    import main_page
+
+#======================================================================
+root = tk.Toplevel()
+root.title('Procurement Page')
+root.geometry('1200x670')
+root.iconphoto(False, tk.PhotoImage(file='images/billing.png'))
+font1 =['Times',16,'normal'] # font size and style 
+font2 = ['Times',22,'normal']
+headingLabel = Label(root,text='Procurement System',font=('times new roman',30,'bold')
+                     ,bg='lime green',bd=12,relief=GROOVE)
+headingLabel.pack(fill=X,pady=1)
+
+distributorDetailsFrame = LabelFrame(root,text='Distributor Details',font=('times new roman',15,'bold')
+                                    ,bd=8,relief=GROOVE,bg='lime green')
+distributorDetailsFrame.pack(fill=X)
+
+nameLabel = Label(distributorDetailsFrame, text='Name',font=('times new roman',15,'bold')
+                  ,bg='lime green',fg='white')
+nameLabel.grid(row=0,column=0,padx=20)
+
+nameEntry = Entry(distributorDetailsFrame,font=('arial',15),bd=4,width=18)
+nameEntry.grid(row=0,column=1,padx=8)
+nameEntry.insert(0,'Default')
+
+paymentLabel = Label(distributorDetailsFrame, text='Payment Method',font=('times new roman',15,'bold')
+                  ,bg='lime green',fg='white')
+paymentLabel.grid(row=0,column=2,padx=20,pady=2)
+
+paymentEntry = Entry(distributorDetailsFrame,font=('arial',15),bd=4,width=18)
+paymentEntry.grid(row=0,column=3,padx=8)
+
+procNumberLabel = Label(distributorDetailsFrame, text='Proc No',font=('times new roman',15,'bold')
+                  ,bg='lime green',fg='white')
+procNumberLabel.grid(row=0,column=4,padx=20,pady=2)
+
+procNumberEntry = Entry(distributorDetailsFrame,font=('arial',15),bd=4,width=18)
+procNumberEntry.grid(row=0,column=5,padx=8)
+
+searchButton = Button(distributorDetailsFrame,text='SEARCH',
+                      font=('arial',12,'bold'),bd=3,width=10,command=lambda:search_proc())
+searchButton.grid(row=0,column=6,padx=20,pady=8)
 
 #Invoice frame
 rightFrame = Frame(root,bd=8,relief=GROOVE)
@@ -259,90 +345,11 @@ b4.grid(row=7,column=0)
 #b4.grid(row=7,columnspan=2)
 total,iid,p_id=0,0,0
 
-#Add functionality
-def my_price(*args):  # *args is used to pass any number of arguments
-    l1.config(text="")  # Clear the label
-    global p_id
-    p_id=0 # If product is not selected from the options then id is 0 
-    for i, j in my_dict.items():  # Loop through the dictionary
-        if j[1] == product.get():  # match the product name
-            prc.set(j[2]) # price is collected. 
-            p_id=j[0]  # Product id is collected
+trv.bind("<<TreeviewSelect>>", my_select)  # User selection of row
+product.trace("w", my_price)  # Call the function on change
 
-def my_add():
-    global iid, p_id
-    iid = iid+1  # Serial number to display 
-    total = round(qty.get()*prc.get(),2) # row wise total 
-    trv.insert("", 'end',iid=iid, values =(iid,p_id,product.get(),qty.get(),prc.get(),total))
-    my_upd(trv)
+root.mainloop()
 
-def my_upd(trv):
-    global total 
-    total,sub_total = 0,0
-    for child in trv.get_children():
-        sub_total = round(sub_total+float(trv.item(child)["values"][5]),2)
-    l6.config(text=str(sub_total)) # shows sub total 
-    #tax=round(0.1*sub_total,2)  # 10 % tax rate, update here
-    #l8.config(text=str(tax))  # tax amount is displayed 
-    total=round(sub_total,2) # tax added to sub total 
-    l10.config(text=str(total))  # Final price is displayed
-    product.set('') # reset the combobox 
-    qty.set(1)  # reset quantity to 1
-    prc.set(0.0) # reset price to 0.0 
-
-def my_select(self):
-    b2.config(state='active') # Delete button is active now 
-
-def data_delete():
-    try:
-        p_id = trv.selection()[0] # collect selected row id
-        trv.delete(p_id)  # remove the selected row from Treeview
-        b2['state'] = 'disabled' # disable the button 
-        my_upd(trv) # Update the total 
-    except Exception as e:
-        messagebox.showerror('Error', f'No product selected')
-
-def my_reset():
-    for item in trv.get_children():
-        trv.delete(item) # remove row 
-    global total
-    total = 0
-    product.set('') # reset combobox
-    qty.set(1) # Update quantity to 1 
-    prc.set(0.0) # Update price to 0.0
-    l6.config(text='0')  # Update display sub total
-    #l8.config(text='0')  # Update display for tax
-    l10.config(text='0') # Update display for total
-
-def insert_data():
-    global total, inv_id, id
-    dt = date.today() # Today's date
-    data = (total,dt) # Data for parameterized query
-    query = "INSERT INTO procurement (total,date) VALUES(?,?)"
-    id = myCursor.execute(query,data)
-    con.commit()
-    inv_id = id.lastrowid # get the bill or invoice number after adding data
-    query = "INSERT INTO procurement_dtl (inv_id,p_id,product,qty,price) \
-                VALUES(?,?,?,?,?)"
-    my_data = [] # list to store multiple rows of data
-    # In all rows invoice id is same
-    for line in trv.get_children():
-        my_list = trv.item(line)['values']
-        my_data.append([inv_id,my_list[1],my_list[2],my_list[3],my_list[4]])
-    i = 0
-    for datum in my_data:
-        myCursor.execute(query,datum)# adding list of products to table
-        con.commit()
-        i = i + 1
-    #print("Rows Added  = ",id.rowcount)
-    l_msg.config(text='proc No:'+str(inv_id)+', Products:'+str(i))
-    l_msg.after(3000,lambda: l_msg.config(text=''))
-    proc_area() # generate bill
-    my_reset() # reset function
-
-def back():
-    root.destroy()
-    import main_page
 """
 def sales_report():
     popSales = Toplevel()
@@ -375,10 +382,6 @@ def sales_report():
     l2.grid(row=2,column=0)
 """
 
-trv.bind("<<TreeviewSelect>>", my_select)  # User selection of row
-product.trace("w", my_price)  # Call the function on change
-
-root.mainloop()
 """
 import tkinter as tk
 import ttkbootstrap as ttk

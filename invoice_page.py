@@ -336,16 +336,20 @@ def sales_report():
     l6.grid(row=6,column=0)
 
 def back():
-        #root.withdraw()
-        root.destroy()
-        import main_page
-
+    #root.destroy()
+    #import main_page
+    #win = Toplevel()
+    root.withdraw()
+    #root.destroy()
+    #import main_page
+    #main_page(win)
+    #main_page.deiconify()
 #=================================================================================================================
-
-root = tk.Tk()
+root = tk.Toplevel()
 root.title('Sales page')
 root.geometry('1200x670')
-root.iconphoto(False, tk.PhotoImage(file='images/billing.png'))
+#root.iconphoto(False, tk.PhotoImage(file='images/billing.png'))
+
 font1 = ['Times',14,'normal'] # font size and style 
 font2 = ['Times',22,'normal']
 

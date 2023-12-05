@@ -213,10 +213,10 @@ def clock():
     datetimeLabel.after(1000, clock)
 
 #Gui part
-root=ttkthemes.ThemedTk()
+root = Toplevel()
 
-root.get_themes()
-root.set_theme('radiance')
+#root.get_themes()
+#root.set_theme('radiance')
 
 root.geometry('1174x700+0+0')
 root.title('Customers')
