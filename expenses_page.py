@@ -111,7 +111,7 @@ def add_data():
         show_data()
             
 def search_data():
-    query = 'SELECT * FROM expenses where reason=? or amount=? or date=?'
+    query = 'SELECT * FROM expenses WHERE reason=? or amount=? or date=?'
     myCursor.execute(query,(reasonEntry.get(),amountEntry.get(),date))
     expensesTable.delete(*expensesTable.get_children())
     fetchedData = myCursor.fetchall()
@@ -201,7 +201,6 @@ def clock():
 
 #Gui part
 root = Toplevel()
-
 #root.get_themes()
 #root.set_theme('radiance')
 

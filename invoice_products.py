@@ -2,6 +2,7 @@ import sqlite3
 
 con = sqlite3.connect('alan_pharm_supermarket.db')
 myCursor = con.cursor()
+
 query = "SELECT * FROM products"
 my_data = list(myCursor.execute(query))  # result set
 my_dict = {}  # Create an empty dictionary

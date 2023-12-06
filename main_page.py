@@ -55,7 +55,7 @@ def invoice():
 def inventory():
     import product_page
 
-def procurement(root):
+def procurement():
     import procurement_page
 
 def expenses():

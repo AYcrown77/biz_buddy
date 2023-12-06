@@ -123,8 +123,8 @@ def bill_area():
 def save_bill():
     if not os.path.exists('bills'):
         os.mkdir('bills')
-    result = messagebox.askyesno('Confirm','Do you want to save the bill?' )
-    if result:
+    #result = messagebox.askyesno('Confirm','Do you want to save the bill?' )
+    else:
         bill_content = textArea.get(1.0,END)
         file = open(f'bills/{billNumber}.txt','w')
         file.write(bill_content)
@@ -192,7 +192,6 @@ def my_upd(trv):
     total,sub_total,outstanding_bal = 0,0,0
     for child in trv.get_children():
         sub_total = round(sub_total+float(trv.item(child)["values"][3]),2)
-    #l6.config(text='#'+str(sub_total)) # shows sub total
     l6.config(text='#'+f"{sub_total:,}") # shows sub total
     for i, j in cust_dict.items():  # Loop through the dictionary
         if j[1] == name_cb.get():
@@ -201,7 +200,7 @@ def my_upd(trv):
     l8.config(text='#'+f"{outstanding_bal:,}")
     #outstanding_bal = round(0.1*sub_total,2)  # 10 % tax rate, update here
     #l8.config(text=str(outstanding_bal))  # tax amount is displayed 
-    total = round(sub_total + outstanding_bal,2) #total 
+    total = round(sub_total,2) #total 
     l10.config(text='#'+f"{total:,}")  # Final amount is displayed
     product.set('') # reset the combobox 
     qty.set(1)  # reset quantity to 1
@@ -238,6 +237,8 @@ def insert_data():
     global total, inv_id, id, pay_mtd, p_id
     if total == 0:
         messagebox.showerror('Error','No product purchased')
+    if paymentEntry.get() == "":
+            messagebox.showerror('Error','What is the payment method')
     else:
         pay_mtd = paymentEntry.get()
         dt = date.today() # Today's date
@@ -255,60 +256,69 @@ def insert_data():
             my_list = trv.item(line)['values']
             #my_data.append([inv_id,my_list[1],my_list[2],my_list[3],my_list[4]])
             my_data.append([inv_id,p_id,my_list[0],my_list[1],my_list[2]])
+
         i = 0
         for datum in my_data:
             myCursor.execute(query,datum)# adding list of products to table
             con.commit()
             i = i + 1
-        if paymentEntry.get() == "":
-            messagebox.showerror('Error','What is the payment method')
-            #print("Rows Added  = ",id.rowcount)
-        else:
-            l_msg.config(text='Bill No:'+str(inv_id)+', Products:'+str(i))
-            l_msg.after(3000, lambda: l_msg.config(text=''))
-            change_qty()
-            bill_area() # generate bill
-            my_reset() # reset function
-            name_cb.set('Default')
+        
+        l_msg.config(text='Bill No:'+str(inv_id)+', Products:'+str(i))
+        l_msg.after(3000, lambda: l_msg.config(text=''))
+        change_qty()
+        bill_area() # generate bill
+        my_reset() # reset function
+        name_cb.set('Default')
+        paymentEntry.set('')
 
 def sales_report():
     def updte(*args): # triggered when value of string varaible changes
         sales = []
         if(len(sel.get())>4):
-            total_sales,total_cash,total_pos,total_cheque = 0,0,0,0
+            total_sales,total_cash,total_pos,total_cheque,total_expenses = 0,0,0,0,0
             dt = cal.get_date() # get selected date object from calendar
             dt1 = dt.strftime("%Y-%m-%d") #format for MySQL date column 
             dt2 = dt.strftime("%d-%B-%Y") #format to display at label
+            dt3 = dt.strftime("%d/%m/%Y") #format for expenses table 
+
             # Get total sales for the day
             query_ts = "SELECT total from invoice WHERE date=?" #Query for total sales 
-            t_sales = con.execute(query_ts,(dt1,)) # execute query with data
+            t_sales = myCursor.execute(query_ts,(dt1,)) # execute query with data
             for sale in t_sales:
-                total_sales = round((total_sales + int(sale[0])), 2)
+                total_sales = round((total_sales + int(sale[0])),2)
             # Get total cash for the day
             query_tc = "SELECT total from invoice WHERE payment_method=? AND date=?" # Query for total cash 
-            t_cash = con.execute(query_tc,('Cash',dt1)) # execute query with data
+            t_cash = myCursor.execute(query_tc,('Cash',dt1)) # execute query with data
             for cash in t_cash:
-                total_cash = round((total_cash + int(cash[0])), 2)
+                total_cash = round((total_cash + int(cash[0])),2)
 
             # Get total pos for the day
             query_tp = "SELECT total from invoice WHERE payment_method=? AND date=?" # Query for total pos 
-            t_pos = con.execute(query_tp,('POS',dt1)) # execute query with data
+            t_pos = myCursor.execute(query_tp,('POS',dt1)) # execute query with data
             for pos in t_pos:
-                total_pos = round((total_pos + int(pos[0])), 2)
+                total_pos = round((total_pos + int(pos[0])),2)
 
             # Get total cheque for the day
             query_ch = "SELECT total from invoice WHERE payment_method=? AND date=?" # Query for total cheque 
-            t_cheque = con.execute(query_ch,('Cheque',dt1)) # execute query with data
+            t_cheque = myCursor.execute(query_ch,('Cheque',dt1)) # execute query with data
             for cheque in t_cheque:
-                total_cheque = round((total_cheque + int(cheque[0])), 2)
+                total_cheque = round((total_cheque + int(cheque[0])),2)
+
+            # Get total expenses for the day 
+            query_ex = "SELECT amount from expenses WHERE date=?" # Query for total cheque 
+            t_expenses = myCursor.execute(query_ex,(dt3,)) # execute query with data
+            for expense in t_expenses:
+                total_expenses = round((total_expenses + int(expense[0])),2)
             
             # Display the rigght values after date prompt
             l1.config(text=dt2) # display date at Label
             l2.config(text=f"Total Cash: #{total_cash:,}") # show total cash
             l3.config(text=f"Total POS: #{total_pos:,}") # show total pos
             l4.config(text=f"Total Cheque: #{total_cheque:,}") # show total cheque
-            l5.config(text="====================") # show total sales
+            l5.config(text="====================")
             l6.config(text=f"Total Sales: #{total_sales:,}") # show total sales
+            l7.config(text=f"Total Expenses: #{total_expenses:,}") # show total expenses
+            
     #Sales report window
     popSales = Toplevel()
     popSales.title('Sales report')
@@ -330,20 +340,13 @@ def sales_report():
     l3.grid(row=3,column=0)
     l4=tk.Label(popSales,font=('Times',22,'bold'),fg='lime green') # total pos
     l4.grid(row=4,column=0)
-    l5=tk.Label(popSales,font=('Times',22,'bold'),fg='black')
+    l5=tk.Label(popSales,font=('Times',22,'bold'),fg='lime green') # total expenses
     l5.grid(row=5,column=0)
-    l6=tk.Label(popSales,font=('Times',22,'bold'),fg='red')
+    l6=tk.Label(popSales,font=('Times',22,'bold'),fg='black')
     l6.grid(row=6,column=0)
+    l7=tk.Label(popSales,font=('Times',22,'bold'),fg='red')
+    l7.grid(row=7,column=0)
 
-def back():
-    #root.destroy()
-    #import main_page
-    #win = Toplevel()
-    root.withdraw()
-    #root.destroy()
-    #import main_page
-    #main_page(win)
-    #main_page.deiconify()
 #=================================================================================================================
 root = tk.Toplevel()
 root.title('Sales page')
@@ -507,15 +510,16 @@ b2.grid(row=3,column=0)
 b3=tk.Button(leftFrame,text='Del All',font=('arial',12,'bold'),bg='red',pady=5,padx=2,command=lambda:my_reset())
 b3.grid(row=3,column=1)
 b4=tk.Button(leftFrame,text='Confirm',font=('arial',18,'bold'),bg='lime green',pady=5,padx=1,command=lambda:insert_data())
-b4.grid(row=6,column=1,columnspan=2)
+b4.grid(row=7,column=3,columnspan=2)
 l_msg=tk.Label(leftFrame,text='',fg='red',font=12)
 l_msg.grid(row=6,column=3,columnspan=2)
 #billMenu,text='Print',font=('arial',16,'bold'),bg='lime green'
 #                     ,bd=5,width=8,pady=5,command=lambda:print_bill())
-b4=Button(leftFrame,text='Back',font=('arial',16,'bold'),bg='lime green',command=lambda:back())
-b4.grid(row=7,column=0,pady=60,padx=5)
-b4=Button(leftFrame,text='Sales Report',font=('arial',16,'bold'),bg='lime green',command=lambda:sales_report())
-b4.grid(row=7,column=1)
+#b4=Button(leftFrame,text='Back',font=('arial',16,'bold'),bg='lime green',command=lambda:back())
+#b4.grid(row=7,column=0,pady=60,padx=5)
+b5=Button(leftFrame,text='Sales Report',font=('arial',16,'bold'),bg='lime green',command=lambda:sales_report())
+b5.grid(row=7,column=1,pady=60,padx=5)
+
 total,iid,p_id=0,0,0
 
 trv.bind("<<TreeviewSelect>>", my_delete)  # User selection of row

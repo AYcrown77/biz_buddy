@@ -249,13 +249,11 @@ def clock():
     datetimeLabel.config(text=f'   Date: {date}\nTime: {currentTime}')
     datetimeLabel.after(1000, clock)
 
-
 #================================================================
 #Gui part
-root = tk.Tk()
+root = tk.Toplevel()
 #root.get_themes()
 #root.set_theme('radiance')
-
 root.geometry('1174x700')
 root.title('Products')
 #root.resizable(False,False)
