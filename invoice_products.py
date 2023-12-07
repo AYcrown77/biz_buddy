@@ -18,3 +18,11 @@ cust_list = []  # Create an empty list
 for row in cust_data:
     cust_dict[[row][0][0]] = row  # id as key
     cust_list.append(row[1])  # name as list
+
+query = "SELECT * FROM supplier"
+sup_data = list(myCursor.execute(query))  # result set
+sup_dict = {}  # Create an empty dictionary
+sup_list = []  # Create an empty list
+for row in sup_data:
+    sup_dict[[row][0][0]] = row  # id as key
+    sup_list.append(row[1])  # name as list

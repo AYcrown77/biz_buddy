@@ -27,6 +27,7 @@ myCursor.execute(query)
 #con.commit()
 #con.close()
 
+
 def toplevel_data(title,button_text,command):
     global productId,productNameEntry,retailPriceEntry,wholesalesPriceEntry,\
         quantityEntry,expiryDateEntry,productCategoryEntry,entryWindow,indexing
@@ -179,16 +180,9 @@ def delete_product():
             myCursor.execute(query,(contentIdInt,))
             con.commit()
             messagebox.showinfo('Deleted',f'The product with product Id {contentIdInt} is deleted succesfully')
-            query = 'SELECT * FROM products'
-            myCursor.execute(query)
-            fetchedData = myCursor.fetchall()
-            productTable.delete(*productTable.get_children())
-            for data in fetchedData:
-                productTable.insert('',END,values=data)
+            show_product()
         except Exception as e:
             messagebox.showerror('Error', f'No product selected')
-    else:
-        pass
 
 def show_product():
     query = 'SELECT * FROM products'
@@ -198,8 +192,43 @@ def show_product():
     for data in fetchedData:
         productTable.insert('',END,values=data)
 
+def view_product():  
+    # product info window
+    popInfo = Toplevel()
+    popInfo.title('Product info')
+    popInfo.grab_set()
+    #popInfo.geometry("500x300")
+    popInfo.resizable(False,False)
+    popInfo.configure(bg='lightgreen')
+
+    # Display the product info
+    l1=tk.Label(popInfo,font=('Times',22,'bold'),fg='black',bg='lightgreen')
+    l1.grid(row=1,column=0,pady=5,sticky=W)
+    l2=tk.Label(popInfo,font=('Times',22,'bold'),fg='black',bg='lightgreen')
+    l2.grid(row=2,column=0,pady=5,sticky=W)
+    l3=tk.Label(popInfo,font=('Times',22,'bold'),fg='black',bg='lightgreen')
+    l3.grid(row=3,column=0,pady=5,sticky=W)
+    l4=tk.Label(popInfo,font=('Times',22,'bold'),fg='black',bg='lightgreen')
+    l4.grid(row=4,column=0,pady=5,sticky=W)
+    l5=tk.Label(popInfo,font=('Times',22,'bold'),fg='black',bg='lightgreen')
+    l5.grid(row=5,column=0,pady=5,sticky=W)
+    l6=tk.Label(popInfo,font=('Times',22,'bold'),fg='black',bg='lightgreen')
+    l6.grid(row=6,column=0,pady=5,sticky=W)
+    try:
+        indexing = productTable.focus()
+        contents = productTable.item(indexing)
+        # Display the right values of the product
+        l1.config(text=f"{nameField[1]}: {contents['values'][1]}")
+        l2.config(text=f"{nameField[2]}: #{contents['values'][2]}")
+        l3.config(text=f"{nameField[3]}: #{contents['values'][3]}")
+        l4.config(text=f"{nameField[4]}: {contents['values'][4]}")
+        l5.config(text=f"{nameField[5]}: {contents['values'][5]}")
+        l6.config(text=f"{nameField[6]}: {contents['values'][6]}")
+    except Exception as e:
+        messagebox.showerror('Error', f'No product selected')
+
 def update_data():
-    query = 'update products set productName=?,retailPrice=?,wholesalesPrice=?,quantity=?,expiryDate=? \
+    query = 'UPDATE products SET productName=?,retailPrice=?,wholesalesPrice=?,quantity=?,expiryDate=? \
             ,productCategory=? where productId=?'
     myCursor.execute(query,(productNameEntry.get(),retailPriceEntry.get(),wholesalesPriceEntry.get(),\
                         quantityEntry.get(),expiryDateEntry.get(),productCategoryEntry.get(),productId))
@@ -228,10 +257,6 @@ def to_exit():
     else:
         pass
 
-def back():
-    root.destroy()
-    import main_page
-
 def slider():
     global txt, count
     if count == len(slide):
@@ -257,49 +282,50 @@ root = tk.Toplevel()
 root.geometry('1174x700')
 root.title('Products')
 #root.resizable(False,False)
+root.configure(bg='lightgreen')
 
-datetimeLabel = Label(root,font=('times new roman',18,'bold'))
+datetimeLabel = Label(root,font=('times new roman',18,'bold'),fg="green",bg='lightgreen')
 datetimeLabel.place(x=5,y=5)
 clock()
 
 slide = 'Alan Pharmacy and Supermarket'
-sliderLabel = Label(root,font=('aerial',18,'italic bold'),width=50)
+sliderLabel = Label(root,font=('aerial',18,'italic bold'),width=50,fg="green",bg='lightgreen')
 sliderLabel.place(x=200,y=0)
 slider()
 
 #connectButton = ttk.Button(root,text='Connect database',command=connect_database)
 #connectButton.place(x=980,y=0)
 
-leftFrame = Frame(root)
+leftFrame = Frame(root,bg='lightgreen')
 leftFrame.place(x=50,y=80,width=300,height=600)
 
 logoImage = PhotoImage(file='images/work.png')
-logoLabel = Label(leftFrame,image=logoImage)
+logoLabel = Label(leftFrame,image=logoImage,bg='lightgreen')
 logoLabel.grid(row=0,column=0)
  
-addProductButton = ttk.Button(leftFrame,text='Add product',width=20,command=lambda :toplevel_data('Add Product','Add product',add_data))
+addProductButton = tk.Button(leftFrame,text='Add product',width=20,font=('arial',12,'bold'),bg='green',command=lambda :toplevel_data('Add Product','Add product',add_data))
 addProductButton.grid(row=1,column=0,pady=10)
 
-searchProductButton = ttk.Button(leftFrame,text='Search product',width=20,command=lambda :toplevel_data('Search Product','Search Product',search_data))
+searchProductButton = tk.Button(leftFrame,text='Search product',width=20,font=('arial',12,'bold'),bg='green',command=lambda :toplevel_data('Search Product','Search Product',search_data))
 searchProductButton.grid(row=2,column=0,pady=10)
 
-updateProductButton = ttk.Button(leftFrame,text='Update product',width=20,command=lambda :toplevel_data('Update Product','Update Product',update_data))
+updateProductButton = tk.Button(leftFrame,text='Update product',width=20,font=('arial',12,'bold'),bg='green',command=lambda :toplevel_data('Update Product','Update Product',update_data))
 updateProductButton.grid(row=3,column=0,pady=10)
 
-showProductButton = ttk.Button(leftFrame,text='Show product',width=20,command=show_product)
+showProductButton = tk.Button(leftFrame,text='Show products',width=20,font=('arial',12,'bold'),bg='green',command=show_product)
 showProductButton.grid(row=4,column=0,pady=10)
 
-exportDataButton = ttk.Button(leftFrame,text='Export data',width=20,command=export_data)
-exportDataButton.grid(row=5,column=0,pady=10)
+viewProductButton = tk.Button(leftFrame,text='View product',width=20,font=('arial',12,'bold'),bg='green',command=view_product)
+viewProductButton.grid(row=5,column=0,pady=10)
 
-deleteProductButton = ttk.Button(leftFrame,text='Delete product',width=20,command=delete_product)
-deleteProductButton.grid(row=6,column=0,pady=10)
+exportDataButton = tk.Button(leftFrame,text='Export data',width=20,font=('arial',12,'bold'),bg='green',command=export_data)
+exportDataButton.grid(row=6,column=0,pady=10)
 
-exitButton = ttk.Button(leftFrame,text='Exit',width=20,command=to_exit)
-exitButton.grid(row=7,column=0,pady=10)
+deleteProductButton = tk.Button(leftFrame,text='Delete product',width=20,font=('arial',12,'bold'),bg='green',command=delete_product)
+deleteProductButton.grid(row=7,column=0,pady=10)
 
-backButton = ttk.Button(leftFrame,text='Back',width=20,command=back)
-backButton.grid(row=8,column=0,pady=10)
+exitButton = tk.Button(leftFrame,text='Exit',width=20,font=('arial',12,'bold'),bg='green',command=to_exit)
+exitButton.grid(row=8,column=0,pady=10)
 
 rightFrame = Frame(root)
 rightFrame.place(x=350,y=80,width=1000,height=600)
@@ -331,9 +357,17 @@ productTable.column('Quantity',anchor=CENTER)
 productTable.column('Expiry Date',anchor=CENTER)
 productTable.column('Product Category',anchor=CENTER)
 
+"""
 style = ttk.Style()
 style.configure('Treeview',rowheight=25,font=('arial',12,'bold'),
-                foreground='green',background='black',fieldbackground='green')
-style.configure('Treeview.Heading',font=('arial',14,'bold'),foreground='green')
+                foreground='black',background='sky blue',fieldbackground='white')
+style.configure('Treeview.Heading',font=('arial',14,'bold'),foreground='lime green')
+"""
+
+style = ttk.Style(rightFrame)
+style.theme_use("clam") # set theme to clam
+style.configure("Treeview", background="azure2", 
+                fieldbackground="lightyellow", foreground="black",font='black')
+style.configure('Treeview.Heading', background="lime green")
 
 root.mainloop()

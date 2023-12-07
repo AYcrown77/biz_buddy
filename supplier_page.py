@@ -1,6 +1,5 @@
 from tkinter import *
 import time
-import ttkthemes
 from tkinter import ttk,messagebox,filedialog
 import sqlite3
 import pandas
@@ -9,7 +8,7 @@ import pandas
 count = 0
 txt = ''
 
-nameField = ['supId','supName','phoneNo','address']
+nameField = ['Id','Name','Phone No','Address']
 
 con = sqlite3.connect('alan_pharm_supermarket.db')
 myCursor = con.cursor()
@@ -111,7 +110,7 @@ def add_data():
         show_data()
             
 def search_data():
-    query = 'SELECT * FROM supplier where supName=? or phoneNo=? or address=?'
+    query = 'SELECT * FROM supplier WHERE supName=? or phoneNo=? or address=?'
     myCursor.execute(query,(supNameEntry.get(),phoneNoEntry.get(),addressEntry.get()))
     supplierTable.delete(*supplierTable.get_children())
     fetchedData = myCursor.fetchall()
@@ -258,7 +257,7 @@ rightFrame.place(x=350,y=80,width=1000,height=600)
 scrollBarX = Scrollbar(rightFrame,orient=HORIZONTAL)
 scrollBarY = Scrollbar(rightFrame,orient=VERTICAL)
 
-supplierTable = ttk.Treeview(rightFrame,columns=('supId','supName','phoneNo','address'),
+supplierTable = ttk.Treeview(rightFrame,columns=('Id','Name','Phone No','Address'),
                     xscrollcommand=scrollBarX.set,yscrollcommand=scrollBarY.set)
 
 scrollBarX.config(command=supplierTable.xview)
@@ -273,10 +272,10 @@ for i in range(0, len(nameField)):
     supplierTable.heading(nameField[i],text=nameField[i])
 supplierTable.config(show='headings')
 
-supplierTable.column('supId',width=50,anchor=CENTER)
-supplierTable.column('supName',width=300,anchor=CENTER)
-supplierTable.column('phoneNo',width=100,anchor=CENTER)
-supplierTable.column('address',width=500,anchor=CENTER)
+supplierTable.column('Id',width=50,anchor=CENTER)
+supplierTable.column('Name',width=300,anchor=CENTER)
+supplierTable.column('Phone No',width=100,anchor=CENTER)
+supplierTable.column('Address',width=500,anchor=CENTER)
 
 style = ttk.Style()
 style.configure('Treeview',rowheight=25,font=('arial',12,'bold'),

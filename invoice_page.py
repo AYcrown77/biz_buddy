@@ -18,32 +18,21 @@ query = '''
         inv_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
         total FLOAT NOT NULL,
         date DATE NOT NULL,
-        payment_method VARCHAR(50) NOT NULL
+        payment_method VARCHAR(10) NOT NULL
     );
     CREATE TABLE IF NOT EXISTS invoice_dtl (
         dtl_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-        inv_id INT(6) NOT NULL,
-        p_id INT(4) NOT NULL,
+        inv_id INTEGER NOT NULL,
+        p_id INTEGER NOT NULL,
         product VARCHAR(50) NOT NULL,
-        qty INT(3) NOT NULL,
+        qty INTEGER NOT NULL,
         price FLOAT NOT NULL
     );
 '''
 
 myCursor.executescript(query)
-"""
-root = tk.Tk()
-root.title('Sales page')
-root.geometry('1200x670')
-root.iconphoto(False, tk.PhotoImage(file='images/billing.png'))
-font1 = ['Times',14,'normal'] # font size and style 
-font2 = ['Times',22,'normal']
 
-headingLabel = Label(root,text='Sales Management System',font=('times new roman',30,'bold')
-                     ,bg='lime green',bd=12,relief=GROOVE)
-headingLabel.pack(fill=X,pady=1)
-"""
-#functionality part of customer details frame
+# Functionality part of customer details frame
 def on_select(event):
     # Get the current value in the combobox
     current_value = name_cb.get()
@@ -52,14 +41,14 @@ def on_select(event):
     # Update the combobox with the filtered list
     name_cb['values'] = filtered_items
 
-#functionality part of invoice/bill frame
+# Functionality part of invoice/bill frame
 def clear_text():
     messagebox.askyesno('Confirm', 'Are you sure you want to clear text?')
     textArea.delete(1.0,END)
 
 def print_bill():
     if textArea.get(1.0,END)=='\n':
-        messagebox.showerror('Error','Bill is empty')
+        messagebox.showerror('Error','Reciept is empty')
     else:
         pfile=tempfile.mktemp('.txt')
         open(pfile,'w').write(textArea.get(1.0,END))
@@ -103,7 +92,7 @@ def bill_area():
         textArea.insert(END,'\n\t\t    08035896001')
         textArea.insert(END,'\n')
         textArea.insert(END,f'\nDate: {todayDate} {currentTime}')
-        textArea.insert(END,f'\nBill Number: {billNumber}')
+        textArea.insert(END,f'\nReciept Number: {billNumber}')
         textArea.insert(END,f'\nCustomer: {name_cb.get()}')
         textArea.insert(END,f'\nPayment Method: {paymentEntry.get()}')
         textArea.insert(END,'\n=======================================================')
@@ -238,7 +227,7 @@ def insert_data():
     if total == 0:
         messagebox.showerror('Error','No product purchased')
     if paymentEntry.get() == "":
-            messagebox.showerror('Error','What is the payment method')
+        messagebox.showerror('Error','What is the payment method')
     else:
         pay_mtd = paymentEntry.get()
         dt = date.today() # Today's date
@@ -273,7 +262,6 @@ def insert_data():
 
 def sales_report():
     def updte(*args): # triggered when value of string varaible changes
-        sales = []
         if(len(sel.get())>4):
             total_sales,total_cash,total_pos,total_cheque,total_expenses = 0,0,0,0,0
             dt = cal.get_date() # get selected date object from calendar
@@ -383,7 +371,7 @@ paymentLabel.grid(row=0,column=2,padx=20,pady=2)
 paymentEntry = ttk.Combobox(customerDetailsFrame, values=['Cash','POS','Cheque'],textvariable='',width=20,font=('arial',15))
 paymentEntry.grid(row=0,column=3,padx=8)
 
-billNumberLabel = Label(customerDetailsFrame, text='Bill No',font=('times new roman',15,'bold')
+billNumberLabel = Label(customerDetailsFrame, text='Reciept No',font=('times new roman',15,'bold')
                   ,bg='lime green',fg='white')
 billNumberLabel.grid(row=0,column=4,padx=20,pady=2)
 
@@ -391,14 +379,14 @@ billNumberEntry = Entry(customerDetailsFrame,font=('arial',15),bd=2,width=18)
 billNumberEntry.grid(row=0,column=5,padx=8)
 
 searchButton = Button(customerDetailsFrame,text='SEARCH',
-                      font=('arial',12,'bold'),bd=3,width=10,command=lambda:search_bill())
+                      font=('arial',12,'bold'),bd=2,bg='white',width=10,command=lambda:search_bill())
 searchButton.grid(row=0,column=6,padx=20,pady=8)
 
 #Bill area frame
 rightFrame = Frame(root,bd=8,relief=GROOVE)
 rightFrame.place(x=850,y=160,width=500,height=550)
 
-billAreaLabel = Label(rightFrame,text='Bill Area',font=('times new roman',15,'bold'),bd=7,relief=GROOVE)
+billAreaLabel = Label(rightFrame,text='Reciept Area',font=('times new roman',15,'bold'),bg='lime green',bd=7,relief=GROOVE)
 billAreaLabel.pack(fill=X)
 
 scrollbar = Scrollbar(rightFrame,orient=VERTICAL)
@@ -423,11 +411,11 @@ billMenu.pack(pady=10)
 #emailButton.grid(row=0,column=2,pady=10)
 
 printButton = Button(billMenu,text='Print',font=('arial',16,'bold'),bg='lime green'
-                     ,bd=5,width=8,pady=5,command=lambda:print_bill())
+                     ,bd=2,width=8,pady=5,command=lambda:print_bill())
 printButton.grid(row=0,column=1,pady=5,padx=5)
 
 clearButton = Button(billMenu,text='Clear',font=('arial',16,'bold'),bg='lime green'
-                     ,bd=5,width=8,pady=5,command=lambda:clear_text())
+                     ,bd=2,width=8,pady=5,command=lambda:clear_text())
 clearButton.grid(row=0,column=2,pady=5,padx=5)
 
 #Product display frame in treeview
@@ -455,7 +443,7 @@ prc=tk.DoubleVar()
 cb_price = ttk.Combobox(leftFrame,textvariable=prc,width=10)
 cb_price.grid(row=0,column=5)
 ##
-b1=tk.Button(leftFrame,text='Add',font=('arial',12,'bold'),bg='lime green',command=lambda:my_add())
+b1=tk.Button(leftFrame,text='Add',font=('arial',12,'bold'),bg='lime green',bd=2,command=lambda:my_add())
 b1.grid(row=0,column=6,padx=10)
 ##
 style = ttk.Style(leftFrame)
@@ -505,11 +493,11 @@ l9.grid(row=5,column=3)
 l10=tk.Label(leftFrame,text='0',fg='red',font=font1,anchor='e')
 l10.grid(row=5,column=4)
     
-b2=tk.Button(leftFrame,text='Delete',state='disabled',font=('arial',12,'bold'),bg='red',command=lambda:data_delete())
+b2=tk.Button(leftFrame,text='Delete',state='disabled',font=('arial',12,'bold'),bg='red',bd=2,command=lambda:data_delete())
 b2.grid(row=3,column=0)
-b3=tk.Button(leftFrame,text='Del All',font=('arial',12,'bold'),bg='red',pady=5,padx=2,command=lambda:my_reset())
+b3=tk.Button(leftFrame,text='Del All',font=('arial',12,'bold'),bg='red',bd=2,command=lambda:my_reset())
 b3.grid(row=3,column=1)
-b4=tk.Button(leftFrame,text='Confirm',font=('arial',18,'bold'),bg='lime green',pady=5,padx=1,command=lambda:insert_data())
+b4=tk.Button(leftFrame,text='Confirm',font=('arial',18,'bold'),bg='lime green',bd=2,command=lambda:insert_data())
 b4.grid(row=7,column=3,columnspan=2)
 l_msg=tk.Label(leftFrame,text='',fg='red',font=12)
 l_msg.grid(row=6,column=3,columnspan=2)
@@ -517,7 +505,7 @@ l_msg.grid(row=6,column=3,columnspan=2)
 #                     ,bd=5,width=8,pady=5,command=lambda:print_bill())
 #b4=Button(leftFrame,text='Back',font=('arial',16,'bold'),bg='lime green',command=lambda:back())
 #b4.grid(row=7,column=0,pady=60,padx=5)
-b5=Button(leftFrame,text='Sales Report',font=('arial',16,'bold'),bg='lime green',command=lambda:sales_report())
+b5=Button(leftFrame,text='Sales Report',font=('arial',16,'bold'),bg='lime green',bd=2,command=lambda:sales_report())
 b5.grid(row=7,column=1,pady=60,padx=5)
 
 total,iid,p_id=0,0,0
