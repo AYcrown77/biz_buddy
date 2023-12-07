@@ -321,19 +321,19 @@ def sales_report():
     sel.trace('w',updte) # Trigger update function
 
     l1=tk.Label(popSales,font=('Times',22,'bold'),fg='blue') # date entered
-    l1.grid(row=1,column=0)
+    l1.grid(row=1,column=0,sticky=W)
     l2=tk.Label(popSales,font=('Times',22,'bold'),fg='lime green') # Total sales
-    l2.grid(row=2,column=0)
+    l2.grid(row=2,column=0,sticky=W)
     l3=tk.Label(popSales,font=('Times',22,'bold'),fg='lime green') # total cash
-    l3.grid(row=3,column=0)
+    l3.grid(row=3,column=0,sticky=W)
     l4=tk.Label(popSales,font=('Times',22,'bold'),fg='lime green') # total pos
-    l4.grid(row=4,column=0)
+    l4.grid(row=4,column=0,sticky=W)
     l5=tk.Label(popSales,font=('Times',22,'bold'),fg='lime green') # total expenses
-    l5.grid(row=5,column=0)
+    l5.grid(row=5,column=0,sticky=W)
     l6=tk.Label(popSales,font=('Times',22,'bold'),fg='black')
-    l6.grid(row=6,column=0)
+    l6.grid(row=6,column=0,sticky=W)
     l7=tk.Label(popSales,font=('Times',22,'bold'),fg='red')
-    l7.grid(row=7,column=0)
+    l7.grid(row=7,column=0,sticky=W)
 
 #=================================================================================================================
 root = tk.Toplevel()
