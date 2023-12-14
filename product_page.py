@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import ttk,messagebox,filedialog
 import sqlite3
 import pandas
+from tkcalendar import DateEntry
 
 #functionality part
 count = 0
@@ -39,39 +40,41 @@ def toplevel_data(title,button_text,command):
             entryWindow.title(title)
             entryWindow.grab_set()
             entryWindow.resizable(False,False)
+            entryWindow.configure(bg='lightgreen')
         
-            productNameLabel = Label(entryWindow,text='Product Name',font=('times new roman',20,'bold'))
+            productNameLabel = Label(entryWindow,text='Product Name',font=('times new roman',20,'bold'),bg='lightgreen')
             productNameLabel.grid(row=0,column=0,padx=30,pady=15,sticky=W)
             productNameEntry = Entry(entryWindow,font=('roman',15,'bold'))
             productNameEntry.grid(row=0,column=1,pady=15,padx=10)
 
-            retailPriceLabel = Label(entryWindow,text='Retail Price',font=('times new roman',20,'bold'))
+            retailPriceLabel = Label(entryWindow,text='Retail Price',font=('times new roman',20,'bold'),bg='lightgreen')
             retailPriceLabel.grid(row=1,column=0,padx=30,pady=15,sticky=W)
             retailPriceEntry = Entry(entryWindow,font=('roman',15,'bold'))
             retailPriceEntry.grid(row=1,column=1,pady=15,padx=10)
 
-            wholesalesPriceLabel = Label(entryWindow,text='Wholesales Price',font=('times new roman',20,'bold'))
+            wholesalesPriceLabel = Label(entryWindow,text='Wholesales Price',font=('times new roman',20,'bold'),bg='lightgreen')
             wholesalesPriceLabel.grid(row=2,column=0,padx=30,pady=15,sticky=W)
             wholesalesPriceEntry = Entry(entryWindow,font=('roman',15,'bold'))
             wholesalesPriceEntry.grid(row=2,column=1,pady=15,padx=10)
 
-            quantityLabel = Label(entryWindow,text='Quantity',font=('times new roman',20,'bold'))
+            quantityLabel = Label(entryWindow,text='Quantity',font=('times new roman',20,'bold'),bg='lightgreen')
             quantityLabel.grid(row=3,column=0,padx=30,pady=15,sticky=W)
             quantityEntry = Entry(entryWindow,font=('roman',15,'bold'))
             quantityEntry.grid(row=3,column=1,pady=15,padx=10)
 
-            expiryDateLabel = Label(entryWindow,text='Expiry Date',font=('times new roman',20,'bold'))
+            expiryDateLabel = Label(entryWindow,text='Expiry Date',font=('times new roman',20,'bold'),bg='lightgreen')
             expiryDateLabel.grid(row=4,column=0,padx=30,pady=15,sticky=W)
-            expiryDateEntry = Entry(entryWindow,font=('roman',15,'bold'))
+            expiryDateEntry = DateEntry(entryWindow,font=('roman',15,'bold'),width=12)
             expiryDateEntry.grid(row=4,column=1,pady=15,padx=10)
 
-            productCategoryLabel = Label(entryWindow,text='Product Category',font=('times new roman',20,'bold'))
+            productCategoryLabel = Label(entryWindow,text='Product Category',font=('times new roman',20,'bold'),bg='lightgreen')
             productCategoryLabel.grid(row=5,column=0,padx=30,pady=15,sticky=W)
             productCategoryEntry = Entry(entryWindow,font=('roman',15,'bold'))
             productCategoryEntry.grid(row=5,column=1,pady=15,padx=10)
 
-            ProductButton = ttk.Button(entryWindow,text=button_text,command=command)
+            ProductButton = tk.Button(entryWindow,text=button_text,font=('roman',15,'bold'),bg="green",command=command)
             ProductButton.grid(row=6,columnspan=2,pady=10)
+
             content = productTable.item(indexing)
             listData = content['values']
             productId = listData[0]
@@ -90,38 +93,39 @@ def toplevel_data(title,button_text,command):
         entryWindow.title(title)
         entryWindow.grab_set()
         entryWindow.resizable(False,False)
+        entryWindow.configure(bg='lightgreen')
 
-        productNameLabel = Label(entryWindow,text='Product Name',font=('times new roman',20,'bold'))
+        productNameLabel = Label(entryWindow,text='Product Name',font=('times new roman',20,'bold'),bg='lightgreen')
         productNameLabel.grid(row=0,column=0,padx=30,pady=15,sticky=W)
         productNameEntry = Entry(entryWindow,font=('roman',15,'bold'))
         productNameEntry.grid(row=0,column=1,pady=15,padx=10)
 
-        retailPriceLabel = Label(entryWindow,text='Retail Price',font=('times new roman',20,'bold'))
+        retailPriceLabel = Label(entryWindow,text='Retail Price',font=('times new roman',20,'bold'),bg='lightgreen')
         retailPriceLabel.grid(row=1,column=0,padx=30,pady=15,sticky=W)
         retailPriceEntry = Entry(entryWindow,font=('roman',15,'bold'))
         retailPriceEntry.grid(row=1,column=1,pady=15,padx=10)
 
-        wholesalesPriceLabel = Label(entryWindow,text='Wholesales Price',font=('times new roman',20,'bold'))
+        wholesalesPriceLabel = Label(entryWindow,text='Wholesales Price',font=('times new roman',20,'bold'),bg='lightgreen')
         wholesalesPriceLabel.grid(row=2,column=0,padx=30,pady=15,sticky=W)
         wholesalesPriceEntry = Entry(entryWindow,font=('roman',15,'bold'))
         wholesalesPriceEntry.grid(row=2,column=1,pady=15,padx=10)
 
-        quantityLabel = Label(entryWindow,text='Quantity',font=('times new roman',20,'bold'))
+        quantityLabel = Label(entryWindow,text='Quantity',font=('times new roman',20,'bold'),bg='lightgreen')
         quantityLabel.grid(row=3,column=0,padx=30,pady=15,sticky=W)
         quantityEntry = Entry(entryWindow,font=('roman',15,'bold'))
         quantityEntry.grid(row=3,column=1,pady=15,padx=10)
 
-        expiryDateLabel = Label(entryWindow,text='Expiry Date',font=('times new roman',20,'bold'))
+        expiryDateLabel = Label(entryWindow,text='Expiry Date',font=('times new roman',20,'bold'),bg='lightgreen')
         expiryDateLabel.grid(row=4,column=0,padx=30,pady=15,sticky=W)
-        expiryDateEntry = Entry(entryWindow,font=('roman',15,'bold'))
+        expiryDateEntry = DateEntry(entryWindow,font=('roman',15,'bold'))
         expiryDateEntry.grid(row=4,column=1,pady=15,padx=10)
 
-        productCategoryLabel = Label(entryWindow,text='Product Category',font=('times new roman',20,'bold'))
+        productCategoryLabel = Label(entryWindow,text='Product Category',font=('times new roman',20,'bold'),bg='lightgreen')
         productCategoryLabel.grid(row=5,column=0,padx=30,pady=15,sticky=W)
         productCategoryEntry = Entry(entryWindow,font=('roman',15,'bold'))
         productCategoryEntry.grid(row=5,column=1,pady=15,padx=10)
 
-        ProductButton = ttk.Button(entryWindow,text=button_text,command=command)
+        ProductButton = tk.Button(entryWindow,text=button_text,font=('roman',15,'bold'),bg="green",command=command)
         ProductButton.grid(row=6,columnspan=2,pady=10)
 
 def add_data():
@@ -192,31 +196,32 @@ def show_product():
     for data in fetchedData:
         productTable.insert('',END,values=data)
 
-def view_product():  
-    # product info window
-    popInfo = Toplevel()
-    popInfo.title('Product info')
-    popInfo.grab_set()
-    #popInfo.geometry("500x300")
-    popInfo.resizable(False,False)
-    popInfo.configure(bg='lightgreen')
+def view_product():
+    indexing = productTable.focus()
+    contents = productTable.item(indexing)
+    if indexing:
+        # product info window
+        popInfo = Toplevel()
+        popInfo.title('Product info')
+        popInfo.grab_set()
+        #popInfo.geometry("500x300")
+        popInfo.resizable(False,False)
+        popInfo.configure(bg='lightgreen')
 
-    # Display the product info
-    l1=tk.Label(popInfo,font=('Times',22,'bold'),fg='black',bg='lightgreen')
-    l1.grid(row=1,column=0,pady=5,sticky=W)
-    l2=tk.Label(popInfo,font=('Times',22,'bold'),fg='black',bg='lightgreen')
-    l2.grid(row=2,column=0,pady=5,sticky=W)
-    l3=tk.Label(popInfo,font=('Times',22,'bold'),fg='black',bg='lightgreen')
-    l3.grid(row=3,column=0,pady=5,sticky=W)
-    l4=tk.Label(popInfo,font=('Times',22,'bold'),fg='black',bg='lightgreen')
-    l4.grid(row=4,column=0,pady=5,sticky=W)
-    l5=tk.Label(popInfo,font=('Times',22,'bold'),fg='black',bg='lightgreen')
-    l5.grid(row=5,column=0,pady=5,sticky=W)
-    l6=tk.Label(popInfo,font=('Times',22,'bold'),fg='black',bg='lightgreen')
-    l6.grid(row=6,column=0,pady=5,sticky=W)
-    try:
-        indexing = productTable.focus()
-        contents = productTable.item(indexing)
+        # Display the product info
+        l1=tk.Label(popInfo,font=('Times',22,'bold'),fg='black',bg='lightgreen')
+        l1.grid(row=1,column=0,pady=5,sticky=W)
+        l2=tk.Label(popInfo,font=('Times',22,'bold'),fg='black',bg='lightgreen')
+        l2.grid(row=2,column=0,pady=5,sticky=W)
+        l3=tk.Label(popInfo,font=('Times',22,'bold'),fg='black',bg='lightgreen')
+        l3.grid(row=3,column=0,pady=5,sticky=W)
+        l4=tk.Label(popInfo,font=('Times',22,'bold'),fg='black',bg='lightgreen')
+        l4.grid(row=4,column=0,pady=5,sticky=W)
+        l5=tk.Label(popInfo,font=('Times',22,'bold'),fg='black',bg='lightgreen')
+        l5.grid(row=5,column=0,pady=5,sticky=W)
+        l6=tk.Label(popInfo,font=('Times',22,'bold'),fg='black',bg='lightgreen')
+        l6.grid(row=6,column=0,pady=5,sticky=W)
+
         # Display the right values of the product
         l1.config(text=f"{nameField[1]}: {contents['values'][1]}")
         l2.config(text=f"{nameField[2]}: #{contents['values'][2]}")
@@ -224,7 +229,8 @@ def view_product():
         l4.config(text=f"{nameField[4]}: {contents['values'][4]}")
         l5.config(text=f"{nameField[5]}: {contents['values'][5]}")
         l6.config(text=f"{nameField[6]}: {contents['values'][6]}")
-    except Exception as e:
+        
+    else:
         messagebox.showerror('Error', f'No product selected')
 
 def update_data():
@@ -274,7 +280,8 @@ def clock():
     datetimeLabel.config(text=f'   Date: {date}\nTime: {currentTime}')
     datetimeLabel.after(1000, clock)
 
-#================================================================
+#====================================================================================
+
 #Gui part
 root = tk.Toplevel()
 #root.get_themes()

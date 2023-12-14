@@ -9,7 +9,6 @@ import sqlite3
 import os,tempfile
 from invoice_products import my_dict,my_list,sup_dict,sup_list
 import platform
-from tkcalendar import DateEntry
 
 con = sqlite3.connect('alan_pharm_supermarket.db')
 myCursor = con.cursor()
