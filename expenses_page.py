@@ -1,15 +1,16 @@
 from tkinter import *
+import tkinter as tk
 import time
-import ttkthemes
 from tkinter import ttk,messagebox,filedialog
 import sqlite3
 import pandas
+from tkcalendar import DateEntry
 
 #functionality part
 count = 0
 txt = ''
 date = time.strftime('%d/%m/%Y')
-nameField = ['expId','reason','amount','date']
+nameField = ['Id','Reason','Amount','Date']
 
 con = sqlite3.connect('alan_pharm_supermarket.db')
 myCursor = con.cursor()
@@ -33,58 +34,56 @@ def toplevel_data(title,button_text,command):
             entryWindow.title(title)
             entryWindow.grab_set()
             entryWindow.resizable(False,False)
+            entryWindow.configure(bg='lightgreen')
         
-            reasonLabel = Label(entryWindow,text='Reason',font=('times new roman',20,'bold'))
+            reasonLabel = Label(entryWindow,text='Reason',font=('times new roman',20,'bold'),bg='lightgreen')
             reasonLabel.grid(row=0,column=0,padx=30,pady=15,sticky=W)
             reasonEntry = Entry(entryWindow,font=('roman',15,'bold'))
             reasonEntry.grid(row=0,column=1,pady=15,padx=10)
 
-            amountLabel = Label(entryWindow,text='Amount',font=('times new roman',20,'bold'))
+            amountLabel = Label(entryWindow,text='Amount',font=('times new roman',20,'bold'),bg='lightgreen')
             amountLabel.grid(row=1,column=0,padx=30,pady=15,sticky=W)
             amountEntry = Entry(entryWindow,font=('roman',15,'bold'))
             amountEntry.grid(row=1,column=1,pady=15,padx=10)
 
-            #dateLabel = Label(entryWindow,text='Date',font=('times new roman',20,'bold'))
-            #dateLabel.grid(row=2,column=0,padx=30,pady=15,sticky=W)
-            #dateEntry = Entry(entryWindow,font=('roman',15,'bold'))
-            #dateEntry.grid(row=2,column=1,pady=15,padx=10)
-
-            expButton = ttk.Button(entryWindow,text=button_text,command=command)
-            expButton.grid(row=6,columnspan=2,pady=10)
+            """
+            dtLabel = Label(entryWindow,text='Date',font=('times new roman',20,'bold'),bg='lightgreen')
+            dtLabel.grid(row=2,column=0,padx=30,pady=15,sticky=W)
+            dtEntry = Entry(entryWindow,font=('roman',15,'bold'))
+            dtEntry.grid(row=2,column=1,pady=15,padx=10)
+            """
+            expButton = tk.Button(entryWindow,text=button_text,font=('roman',15,'bold'),bg="green",command=command)
+            expButton.grid(row=3,columnspan=2,pady=10)
 
             content = expensesTable.item(indexing)
             listData = content['values']
             expId = listData[0]
             reasonEntry.insert(0,listData[1])
             amountEntry.insert(0,listData[2])
-            date = listData[3]
+            #dtEntry.insert(0,listData[3])
         else:
             messagebox.showerror('Error', f'No data selected')
             return
 
-    if title != 'Update Expenses':
+    if title == 'Add Expenses':
         entryWindow = Toplevel()
         entryWindow.title(title)
         entryWindow.grab_set()
         entryWindow.resizable(False,False)
+        entryWindow.configure(bg='lightgreen')
 
-        reasonLabel = Label(entryWindow,text='Reason',font=('times new roman',20,'bold'))
+        reasonLabel = Label(entryWindow,text='Reason',font=('times new roman',20,'bold'),bg='lightgreen')
         reasonLabel.grid(row=0,column=0,padx=30,pady=15,sticky=W)
         reasonEntry = Entry(entryWindow,font=('roman',15,'bold'))
         reasonEntry.grid(row=0,column=1,pady=15,padx=10)
 
-        amountLabel = Label(entryWindow,text='Amount',font=('times new roman',20,'bold'))
+        amountLabel = Label(entryWindow,text='Amount',font=('times new roman',20,'bold'),bg='lightgreen')
         amountLabel.grid(row=1,column=0,padx=30,pady=15,sticky=W)
         amountEntry = Entry(entryWindow,font=('roman',15,'bold'))
         amountEntry.grid(row=1,column=1,pady=15,padx=10)
 
-        dateLabel = Label(entryWindow,text='Date',font=('times new roman',20,'bold'))
-        dateLabel.grid(row=2,column=0,padx=30,pady=15,sticky=W)
-        dateEntry = Entry(entryWindow,font=('roman',15,'bold'))
-        dateEntry.grid(row=2,column=1,pady=15,padx=10)
-
-        expButton = ttk.Button(entryWindow,text=button_text,command=command)
-        expButton.grid(row=6,columnspan=2,pady=10)
+        expButton = tk.Button(entryWindow,text=button_text,font=('roman',15,'bold'),bg="green",command=command)
+        expButton.grid(row=3,columnspan=2,pady=10)
 
 def add_data():
     if reasonEntry.get()=='' or amountEntry.get()=='': #or dateEntry.get()=='':
@@ -111,14 +110,29 @@ def add_data():
         show_data()
             
 def search_data():
-    query = 'SELECT * FROM expenses WHERE reason=? or amount=? or date=?'
-    myCursor.execute(query,(reasonEntry.get(),amountEntry.get(),date))
-    expensesTable.delete(*expensesTable.get_children())
-    fetchedData = myCursor.fetchall()
-    if not fetchedData:
-        messagebox.showerror('Error', f'No match')
-    for data in fetchedData:
-        expensesTable.insert('',END,values=data)
+    def enter():
+        query = 'SELECT * FROM expenses WHERE date=?'
+        myCursor.execute(query,(dateSearchEntry.get(),))
+        expensesTable.delete(*expensesTable.get_children())
+        fetchedData = myCursor.fetchall()
+        if not fetchedData:
+            messagebox.showerror('Error', f'No match')
+        for data in fetchedData:
+            expensesTable.insert('',END,values=data)
+
+    entryWindow = Toplevel()
+    entryWindow.title("Search expenses by date")
+    entryWindow.grab_set()
+    entryWindow.resizable(False,False)
+    entryWindow.configure(bg='lightgreen')
+
+    dateSearchLabel = Label(entryWindow,text='Enter date',font=('times new roman',20,'bold'),bg='lightgreen')
+    dateSearchLabel.grid(row=0,column=0,padx=30,pady=15,sticky=W)
+    dateSearchEntry = DateEntry(entryWindow,font=('roman',15,'bold'))
+    dateSearchEntry.grid(row=0,column=1,pady=15,padx=10)
+
+    enterButton = tk.Button(entryWindow,text='Enter',width=20,font=('arial',12,'bold'),bg='green',command=enter)
+    enterButton.grid(row=1,column=1,pady=15,padx=10)
 
 def delete_data():
     result = messagebox.askyesno('Confirm','Do you want to delete?')
@@ -128,7 +142,7 @@ def delete_data():
             content = expensesTable.item(indexing)
             contentId = content['values'][0]
             contentIdInt = int(contentId)
-            query = 'DELETE FROM expenses WHERE expId = ?'
+            query = 'DELETE FROM expenses WHERE expId=?'
             myCursor.execute(query,(contentIdInt,))
             con.commit()
             messagebox.showinfo('Deleted',f'The expenses with expenses Id {contentIdInt} is deleted succesfully')
@@ -152,8 +166,8 @@ def show_data():
         expensesTable.insert('',END,values=data)
 
 def update_data():
-    query = 'UPDATE expenses SET reason=?,amount=?,date=? where expId=?'
-    myCursor.execute(query,(reasonEntry.get(),amountEntry.get(),date,expId))
+    query = 'UPDATE expenses SET reason=?,amount=? WHERE expId=?'
+    myCursor.execute(query,(reasonEntry.get(),amountEntry.get(),expId))
     con.commit()
     messagebox.showinfo('Success',f'Expenses is modified successfully',parent=entryWindow)
     entryWindow.destroy()
@@ -178,10 +192,6 @@ def to_exit():
     else:
         pass
 
-def back():
-    root.destroy()
-    import main_page
-
 def slider():
     global txt, count
     if count == len(slide):
@@ -199,65 +209,61 @@ def clock():
     datetimeLabel.config(text=f'   Date: {date}\nTime: {currentTime}')
     datetimeLabel.after(1000, clock)
 
+#=============================================================================================
 #Gui part
-root = Toplevel()
-#root.get_themes()
-#root.set_theme('radiance')
-
-root.geometry('1174x700+0+0')
+root = tk.Toplevel()
+root.geometry('1174x700')
 root.title('Expenses')
-#root.resizable(False,False)
+root.configure(bg='lightgreen')
 
-datetimeLabel = Label(root,font=('times new roman',18,'bold'))
+datetimeLabel = Label(root,font=('times new roman',18,'bold'),fg="green",bg='lightgreen')
 datetimeLabel.place(x=5,y=5)
 clock()
 
 slide = 'Alan Pharmacy and Supermarket'
-sliderLabel = Label(root,font=('aerial',18,'italic bold'),width=50)
+sliderLabel = Label(root,font=('aerial',18,'italic bold'),width=50,fg="green",bg='lightgreen')
 sliderLabel.place(x=200,y=0)
 slider()
 
 #connectButton = ttk.Button(root,text='Connect database',command=connect_database)
 #connectButton.place(x=980,y=0)
 
-leftFrame = Frame(root)
+leftFrame = Frame(root,bg='lightgreen')
 leftFrame.place(x=50,y=80,width=300,height=600)
 
 logoImage = PhotoImage(file='images/work.png')
-logoLabel = Label(leftFrame,image=logoImage)
+logoLabel = Label(leftFrame,image=logoImage,bg='lightgreen')
 logoLabel.grid(row=0,column=0)
- 
-addexpButton = ttk.Button(leftFrame,text='Add Expenses',width=20,command=lambda :toplevel_data('Add Expenses','Add Expenses',add_data))
+
+addexpButton = tk.Button(leftFrame,text='Add Expenses',width=20,font=('arial',12,'bold'),bg='green',command=lambda :toplevel_data('Add Expenses','Add Expenses',add_data))
 addexpButton.grid(row=1,column=0,pady=10)
 
-searchexpButton = ttk.Button(leftFrame,text='Search Expenses',width=20,command=lambda :toplevel_data('Search Expenses','Search Expenses',search_data))
+searchexpButton = tk.Button(leftFrame,text='Search Expenses',width=20,font=('arial',12,'bold'),bg='lime green',command=search_data)
 searchexpButton.grid(row=2,column=0,pady=10)
 
-updateexpButton = ttk.Button(leftFrame,text='Update Expenses',width=20,command=lambda :toplevel_data('Update Expenses','Update Expenses',update_data))
+updateexpButton = tk.Button(leftFrame,text='Update Expenses',width=20,font=('arial',12,'bold'),bg='green',command=lambda :toplevel_data('Update Expenses','Update Expenses',update_data))
 updateexpButton.grid(row=3,column=0,pady=10)
 
-showexpButton = ttk.Button(leftFrame,text='Show Expenses',width=20,command=show_data)
+showexpButton = tk.Button(leftFrame,text='Show Expenses',width=20,font=('arial',12,'bold'),bg='lime green',command=show_data)
 showexpButton.grid(row=4,column=0,pady=10)
 
-exportDataButton = ttk.Button(leftFrame,text='Export data',width=20,command=export_data)
+exportDataButton = tk.Button(leftFrame,text='Export data',width=20,font=('arial',12,'bold'),bg='green',command=export_data)
 exportDataButton.grid(row=5,column=0,pady=10)
 
-deleteexpButton = ttk.Button(leftFrame,text='Delete Expenses',width=20,command=delete_data)
+deleteexpButton = tk.Button(leftFrame,text='Delete Expenses',width=20,font=('arial',12,'bold'),bg='red',command=delete_data)
 deleteexpButton.grid(row=6,column=0,pady=10)
 
-exitButton = ttk.Button(leftFrame,text='Exit',width=20,command=to_exit)
+exitButton = tk.Button(leftFrame,text='Exit',width=20,font=('arial',12,'bold'),bg='lime green',command=to_exit)
 exitButton.grid(row=7,column=0,pady=10)
 
-backButton = ttk.Button(leftFrame,text='Back',width=20,command=back)
-backButton.grid(row=8,column=0,pady=10)
-
+#Treeview Frame
 rightFrame = Frame(root)
 rightFrame.place(x=350,y=80,width=1000,height=600)
 
 scrollBarX = Scrollbar(rightFrame,orient=HORIZONTAL)
 scrollBarY = Scrollbar(rightFrame,orient=VERTICAL)
 
-expensesTable = ttk.Treeview(rightFrame,columns=('expId','reason','amount','date'),
+expensesTable = ttk.Treeview(rightFrame,columns=('Id','Reason','Amount','Date'),
                     xscrollcommand=scrollBarX.set,yscrollcommand=scrollBarY.set)
 
 scrollBarX.config(command=expensesTable.xview)
@@ -271,15 +277,15 @@ expensesTable.pack(fill=BOTH,expand=1)
 for i in range(0, len(nameField)):
     expensesTable.heading(nameField[i],text=nameField[i])
 expensesTable.config(show='headings')
+expensesTable.column('Id',width=50,anchor='w')
+expensesTable.column('Reason',width=500,anchor='w')
+expensesTable.column('Amount',width=100,anchor='w')
+expensesTable.column('Date',width=50,anchor='w')
 
-expensesTable.column('expId',width=50,anchor=CENTER)
-expensesTable.column('reason',width=500,anchor=CENTER)
-expensesTable.column('amount',width=100,anchor=CENTER)
-expensesTable.column('date',width=50,anchor=CENTER)
-
-style = ttk.Style()
-style.configure('Treeview',rowheight=25,font=('arial',12,'bold'),
-                foreground='green',background='black',fieldbackground='green')
-style.configure('Treeview.Heading',font=('arial',14,'bold'),foreground='green')
+style = ttk.Style(rightFrame)
+style.theme_use("clam") # set theme to clam
+style.configure("Treeview", background="azure2", 
+                fieldbackground="lightyellow", foreground="black",font='black')
+style.configure('Treeview.Heading', background="lime green")
 
 root.mainloop()

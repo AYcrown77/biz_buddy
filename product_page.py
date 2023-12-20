@@ -1,5 +1,4 @@
 from tkinter import *
-from datetime import datetime, timedelta
 import time
 import tkinter as tk
 from tkinter import ttk,messagebox,filedialog
@@ -160,17 +159,6 @@ def add_data():
             messagebox.showerror('Error','An error occurred while adding data',parent=entryWindow)
             return
         show_product()
-"""
-def search_data():
-    query = 'SELECT * FROM products WHERE productName=? OR retailPrice=? OR wholesalesPrice=? OR quantity<=? OR expiryDate=? OR productCategory=?'
-    myCursor.execute(query,(productNameEntry.get(),retailPriceEntry.get(),wholesalesPriceEntry.get(),quantityEntry.get(),expiryDateEntry.get(),productCategoryEntry.get()))
-    productTable.delete(*productTable.get_children())
-    fetchedData = myCursor.fetchall()
-    if not fetchedData:
-        messagebox.showerror('Error', 'No match')
-    for data in fetchedData:
-        productTable.insert('', END, values=data)
-"""
 
 def search_by_name():
     def enter():
@@ -223,7 +211,7 @@ def expiry_check():
 def check_stock():
     def enter():
         query = 'SELECT * FROM products WHERE quantity<=?'
-        myCursor.execute(query, (quantitySearchEntry.get(),))
+        myCursor.execute(query,(quantitySearchEntry.get(),))
         productTable.delete(*productTable.get_children())
         fetchedData = myCursor.fetchall()
         if not fetchedData:
@@ -350,11 +338,8 @@ def clock():
 
 #Gui part
 root = tk.Toplevel()
-#root.get_themes()
-#root.set_theme('radiance')
 root.geometry('1174x700')
 root.title('Products')
-#root.resizable(False,False)
 root.configure(bg='lightgreen')
 
 datetimeLabel = Label(root,font=('times new roman',18,'bold'),fg="green",bg='lightgreen')
@@ -366,9 +351,7 @@ sliderLabel = Label(root,font=('aerial',18,'italic bold'),width=50,fg="green",bg
 sliderLabel.place(x=200,y=0)
 slider()
 
-#connectButton = ttk.Button(root,text='Connect database',command=connect_database)
-#connectButton.place(x=980,y=0)
-
+#Sidebar menu frame
 leftFrame = Frame(root,bg='lightgreen')
 leftFrame.place(x=50,y=80,width=300,height=600)
 
@@ -425,7 +408,6 @@ productTable.pack(fill=BOTH,expand=1)
 for i in range(0, len(nameField)):
     productTable.heading(nameField[i],text=nameField[i])
 productTable.config(show='headings')
-
 productTable.column('Product Id',width=90,anchor='w')
 productTable.column('Product Name',width=450,anchor='w')
 productTable.column('Retail Price',anchor='w')
@@ -433,13 +415,6 @@ productTable.column('Wholesales Price',anchor='w')
 productTable.column('Quantity',anchor='w')
 productTable.column('Expiry Date',anchor='w')
 productTable.column('Product Category',anchor='w')
-
-"""
-style = ttk.Style()
-style.configure('Treeview',rowheight=25,font=('arial',12,'bold'),
-                foreground='black',background='sky blue',fieldbackground='white')
-style.configure('Treeview.Heading',font=('arial',14,'bold'),foreground='lime green')
-"""
 
 style = ttk.Style(rightFrame)
 style.theme_use("clam") # set theme to clam

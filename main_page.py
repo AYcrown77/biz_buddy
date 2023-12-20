@@ -96,11 +96,11 @@ closeIcon = PhotoImage(file="images/close.png", master=root)
 
 
 # top Navigation bar:
-topFrame = tk.Frame(root, bg=color["lime green"])
+topFrame = tk.Frame(root, bg='sky blue')
 topFrame.pack(side="top", fill=tk.X)
 
 # Header label text:
-homeLabel = tk.Label(topFrame, text="", font="Bahnschrift 15", bg=color["lime green"], fg="gray17", height=2, padx=20)
+homeLabel = tk.Label(topFrame, text="", font="Bahnschrift 15", bg='sky blue', fg="gray17", height=2, padx=20)
 homeLabel.pack(side="right")
 
 # Main label text:
@@ -108,14 +108,14 @@ brandLabel = tk.Label(root, text="", font="System 30", bg="gray17", fg="green")
 brandLabel.place(x=100, y=250)
 
 # Navbar button:
-navbarBtn = tk.Button(topFrame, image=navIcon, bg=color["lime green"], activebackground=color["lime green"],
+navbarBtn = tk.Button(topFrame, image=navIcon, bg='sky blue', activebackground='sky blue',
                     bd=0, padx=20)
 navbarBtn.place(x=10, y=10)
 
 # setting Navbar frame:
 navRoot = tk.Frame(root, bg="gray17", height=1000, width=300)
 navRoot.place(x=-300, y=0)
-tk.Label(navRoot, font="Bahnschrift 15", bg=color["lime green"], fg="black", height=2, width=300, padx=20).place(x=0, y=0)
+tk.Label(navRoot, font="Bahnschrift 15", bg='sky blue', fg="black", height=2, width=300, padx=20).place(x=0, y=0)
 
 # set y-coordinate of Navbar widgets:
 #y = 80
@@ -132,7 +132,7 @@ invoiceButton = tk.Button(navRoot, text="Sales Management", font="BahnschriftLig
             activeforeground="green", bd=0, command=invoice).place(x=25, y=80)
 inventoryButton = tk.Button(navRoot, text="Inventory Management", font="BahnschriftLight 15", bg="gray17", fg=color["lime green"], activebackground="gray17",
             activeforeground="green", bd=0, command=inventory).place(x=25, y=130)
-procurementButton = tk.Button(navRoot, text="Procurement Management", font="BahnschriftLight 15", bg="gray17", fg=color["lime green"], activebackground="gray17",
+procurementButton = tk.Button(navRoot, text="Procurement Manager", font="BahnschriftLight 15", bg="gray17", fg=color["lime green"], activebackground="gray17",
             activeforeground="green", bd=0, command=procurement).place(x=25, y=180)
 expensesButton = tk.Button(navRoot, text="Expenses Management", font="BahnschriftLight 15", bg="gray17", fg=color["lime green"], activebackground="gray17",
             activeforeground="green", bd=0, command=expenses).place(x=25, y=230)
@@ -148,43 +148,6 @@ closeBtn.place(x=250, y=10)
 #global username, password
 #username = 'Alan Pharmacy'
 
-"""
-def change_password():
-    entryWindow = Toplevel()
-    entryWindow.title('Change Password')
-    entryWindow.grab_set()
-    entryWindow.resizable(False,False)
-
-    oldPassLabel = Label(entryWindow,text='Old Password',font=('times new roman',20,'bold'))
-    oldPassLabel.grid(row=0,column=0,padx=30,pady=15,sticky=W)
-    oldPassEntry = Entry(entryWindow,font=('roman',15,'bold'))
-    oldPassEntry.grid(row=0,column=1,pady=15,padx=10)
-
-    newPassLabel = Label(entryWindow,text='New Password',font=('times new roman',20,'bold'))
-    newPassLabel.grid(row=1,column=0,padx=30,pady=15,sticky=W)
-    newPassEntry = Entry(entryWindow,font=('roman',15,'bold'))
-    newPassEntry.grid(row=1,column=1,pady=15,padx=10)
-
-    confirmNewLabel = Label(entryWindow,text='Confirm Password',font=('times new roman',20,'bold'))
-    confirmNewLabel.grid(row=2,column=0,padx=30,pady=15,sticky=W)
-    confirmNewEntry = Entry(entryWindow,font=('roman',15,'bold'))
-    confirmNewEntry.grid(row=2,column=1,pady=15,padx=10)
-
-    ProductButton = Button(entryWindow,text='Confirm Change',font=('times new roman',14,'bold'),width=15,
-                    fg='white',bg='lime green', activebackground='cornflowerblue',
-                    activeforeground='white',cursor='hand2',command='')
-    ProductButton.grid(row=3,columnspan=2,pady=10)
-
-def confirm_change():
-    if usernameEntry.get()=='' or passwordEntry.get()=='':
-        messagebox.showerror('Error', 'Fields can not be empty')
-    elif usernameEntry.get()=='Alan Pharmacy' and passwordEntry.get()=='1234':
-        messagebox.showinfo('Success', 'Successful')
-        switch()
-        passwordEntry.delete(0, tk.END)
-    else:
-        messagebox.showerror('Error', 'Enter correct credentials')    
-"""
 loginFrame = Frame(root,bg='#c8dae0')
 loginFrame.place(x=400, y=150)
 
@@ -208,14 +171,8 @@ passwordEntry = Entry(loginFrame,font=('times new roman',20,'bold'),bd=2,fg='bla
 passwordEntry.grid(row=2,column=1,pady=10,padx=20)
 
 loginButton = Button(loginFrame,text='Login',font=('times new roman',14,'bold'),width=15,
-                        fg='white',bg='lime green', activebackground='cornflowerblue',
-                        activeforeground='white',cursor='hand2',command=login)
+                        fg='black',bg='blue', activebackground='cornflowerblue',
+                        activeforeground='black',cursor='hand2',command=login)
 loginButton.grid(row=3,column=1,pady=10)
-
-#changePasswordButton = Button(loginFrame,text='Change Password',font=('times new roman',14,'bold'),width=15,
-#                    fg='white',bg='lime green', activebackground='cornflowerblue',
-#                    activeforeground='white',cursor='hand2',command=change_password)
-#changePasswordButton.grid(row=3,column=0,pady=10)
-
 
 root.mainloop()
