@@ -468,10 +468,10 @@ trv["columns"] = ("1","2","3","4")
 trv['show'] = 'headings'
 #trv.column("1", width = 40, anchor ='w') # width & alignment
 #trv.column("2", width=40, anchor="w")
-trv.column("1", width = 450, anchor ='w')
-trv.column("2", width = 60, anchor ='w')
-trv.column("3", width = 100, anchor ='w')
-trv.column("4", width = 120, anchor ='w')
+trv.column("1", width = 450, anchor='w')
+trv.column("2", width = 60, anchor='w')
+trv.column("3", width = 100, anchor='w')
+trv.column("4", width = 120, anchor='w')
 #trv.heading("1", text ="Sl No") # Heading text
 #trv.heading("2", text="p_id")  # Heading text
 trv.heading("1", text ="Product")

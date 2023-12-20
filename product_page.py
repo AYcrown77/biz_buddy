@@ -1,4 +1,5 @@
 from tkinter import *
+from datetime import datetime, timedelta
 import time
 import tkinter as tk
 from tkinter import ttk,messagebox,filedialog
@@ -64,12 +65,12 @@ def toplevel_data(title,button_text,command):
 
             expiryDateLabel = Label(entryWindow,text='Expiry Date',font=('times new roman',20,'bold'),bg='lightgreen')
             expiryDateLabel.grid(row=4,column=0,padx=30,pady=15,sticky=W)
-            expiryDateEntry = DateEntry(entryWindow,font=('roman',15,'bold'),width=12)
+            expiryDateEntry = DateEntry(entryWindow,font=('roman',15,'bold'),width=12,date_pattern="yyyy-mm-dd")
             expiryDateEntry.grid(row=4,column=1,pady=15,padx=10)
 
             productCategoryLabel = Label(entryWindow,text='Product Category',font=('times new roman',20,'bold'),bg='lightgreen')
             productCategoryLabel.grid(row=5,column=0,padx=30,pady=15,sticky=W)
-            productCategoryEntry = Entry(entryWindow,font=('roman',15,'bold'))
+            productCategoryEntry = ttk.Combobox(entryWindow,values=['Drug','Supermarket'],font=('roman',15,'bold'))
             productCategoryEntry.grid(row=5,column=1,pady=15,padx=10)
 
             ProductButton = tk.Button(entryWindow,text=button_text,font=('roman',15,'bold'),bg="green",command=command)
@@ -88,7 +89,7 @@ def toplevel_data(title,button_text,command):
             messagebox.showerror('Error', f'No product selected')
             return
 
-    if title != 'Update Product':
+    if title == 'Add Product':
         entryWindow = Toplevel()
         entryWindow.title(title)
         entryWindow.grab_set()
@@ -117,12 +118,12 @@ def toplevel_data(title,button_text,command):
 
         expiryDateLabel = Label(entryWindow,text='Expiry Date',font=('times new roman',20,'bold'),bg='lightgreen')
         expiryDateLabel.grid(row=4,column=0,padx=30,pady=15,sticky=W)
-        expiryDateEntry = DateEntry(entryWindow,font=('roman',15,'bold'))
+        expiryDateEntry = DateEntry(entryWindow,font=('roman',15,'bold'),date_pattern="yyyy-mm-dd")
         expiryDateEntry.grid(row=4,column=1,pady=15,padx=10)
 
         productCategoryLabel = Label(entryWindow,text='Product Category',font=('times new roman',20,'bold'),bg='lightgreen')
         productCategoryLabel.grid(row=5,column=0,padx=30,pady=15,sticky=W)
-        productCategoryEntry = Entry(entryWindow,font=('roman',15,'bold'))
+        productCategoryEntry = ttk.Combobox(entryWindow,values=['Drug','Supermarket'],font=('roman',15,'bold'))
         productCategoryEntry.grid(row=5,column=1,pady=15,padx=10)
 
         ProductButton = tk.Button(entryWindow,text=button_text,font=('roman',15,'bold'),bg="green",command=command)
@@ -159,18 +160,89 @@ def add_data():
             messagebox.showerror('Error','An error occurred while adding data',parent=entryWindow)
             return
         show_product()
-            
+"""
 def search_data():
-    query = 'SELECT * FROM products where productName=? or retailPrice=? or wholesalesPrice=? or quantity=? \
-            or expiryDate=? or productCategory=?'
-    myCursor.execute(query,(productNameEntry.get(),retailPriceEntry.get(),wholesalesPriceEntry.get(),\
-                            quantityEntry.get(),expiryDateEntry.get(),productCategoryEntry.get()))
+    query = 'SELECT * FROM products WHERE productName=? OR retailPrice=? OR wholesalesPrice=? OR quantity<=? OR expiryDate=? OR productCategory=?'
+    myCursor.execute(query,(productNameEntry.get(),retailPriceEntry.get(),wholesalesPriceEntry.get(),quantityEntry.get(),expiryDateEntry.get(),productCategoryEntry.get()))
     productTable.delete(*productTable.get_children())
     fetchedData = myCursor.fetchall()
     if not fetchedData:
-        messagebox.showerror('Error', f'No match')
+        messagebox.showerror('Error', 'No match')
     for data in fetchedData:
-        productTable.insert('',END,values=data)
+        productTable.insert('', END, values=data)
+"""
+
+def search_by_name():
+    def enter():
+        query = 'SELECT * FROM products WHERE LOWER(productName) LIKE LOWER(?)'
+        myCursor.execute(query, ('%' + nameSearchEntry.get()+ '%',))
+        productTable.delete(*productTable.get_children())
+        fetchedData = myCursor.fetchall()
+        if not fetchedData:
+            messagebox.showerror('Error', 'No match')
+        for data in fetchedData:
+            productTable.insert('', END, values=data)
+
+    entryWindow = Toplevel()
+    entryWindow.title("Search product by name")
+    entryWindow.grab_set()
+    entryWindow.resizable(False,False)
+    entryWindow.configure(bg='lightgreen')
+
+    nameSearchLabel = Label(entryWindow,text='Enter Name',font=('times new roman',20,'bold'),bg='lightgreen')
+    nameSearchLabel.grid(row=0,column=0,padx=30,pady=15,sticky=W)
+    nameSearchEntry = Entry(entryWindow,font=('roman',15,'bold'))
+    nameSearchEntry.grid(row=0,column=1,pady=15,padx=10)
+    enterButton = tk.Button(entryWindow,text='Enter',width=20,font=('arial',12,'bold'),bg='green',command=enter)
+    enterButton.grid(row=1,column=1,pady=15,padx=10)
+
+def expiry_check():
+    def enter():
+        query ='SELECT * from products where julianday(expiryDate) - julianday() <= ?;'
+        myCursor.execute(query, (int(expiringEntry.get()),))
+        productTable.delete(*productTable.get_children())
+        fetchedData = myCursor.fetchall()
+        if not fetchedData:
+            messagebox.showerror('Error', 'No match')
+        for data in fetchedData:
+            productTable.insert('', END, values=data)
+
+    entryWindow = Toplevel()
+    entryWindow.title("Expiring product")
+    entryWindow.grab_set()
+    entryWindow.resizable(False,False)
+    entryWindow.configure(bg='lightgreen')
+
+    expiringLabel = Label(entryWindow,text='No of days',font=('times new roman',20,'bold'),bg='lightgreen')
+    expiringLabel.grid(row=0,column=0,padx=30,pady=15,sticky=W)
+    expiringEntry = Entry(entryWindow,font=('roman',15,'bold'))
+    expiringEntry.grid(row=0,column=1,pady=15,padx=10)
+    enterButton = tk.Button(entryWindow,text='Enter',width=20,font=('arial',12,'bold'),bg='green',command=enter)
+    enterButton.grid(row=1,column=1,pady=15,padx=10)
+
+def check_stock():
+    def enter():
+        query = 'SELECT * FROM products WHERE quantity<=?'
+        myCursor.execute(query, (quantitySearchEntry.get(),))
+        productTable.delete(*productTable.get_children())
+        fetchedData = myCursor.fetchall()
+        if not fetchedData:
+            messagebox.showerror('Error', 'No match')
+        for data in fetchedData:
+            productTable.insert('', END, values=data)
+
+    entryWindow = Toplevel()
+    entryWindow.title("Search product by quantity")
+    entryWindow.grab_set()
+    entryWindow.resizable(False,False)
+    entryWindow.configure(bg='lightgreen')
+
+    quantitySearchLabel = Label(entryWindow,text='Enter Quantity',font=('times new roman',20,'bold'),bg='lightgreen')
+    quantitySearchLabel.grid(row=0,column=0,padx=30,pady=15,sticky=W)
+    quantitySearchEntry = Entry(entryWindow,font=('roman',15,'bold'))
+    quantitySearchEntry.grid(row=0,column=1,pady=15,padx=10)
+    enterButton = tk.Button(entryWindow,text='Enter',width=20,font=('arial',12,'bold'),bg='green',command=enter)
+    enterButton.grid(row=1,column=1,pady=15,padx=10)
 
 def delete_product():
     result = messagebox.askyesno('Confirm','Do you want to delete?')
@@ -256,12 +328,6 @@ def export_data():
     table.to_csv(url,index=False)
     messagebox.showinfo('Success','Data saved successfully')
 
-def to_exit():
-    result = messagebox.askyesno('Confirm','Do you want to exit?')
-    if result:
-        root.destroy()
-    else:
-        pass
 
 def slider():
     global txt, count
@@ -313,27 +379,31 @@ logoLabel.grid(row=0,column=0)
 addProductButton = tk.Button(leftFrame,text='Add product',width=20,font=('arial',12,'bold'),bg='green',command=lambda :toplevel_data('Add Product','Add product',add_data))
 addProductButton.grid(row=1,column=0,pady=10)
 
-searchProductButton = tk.Button(leftFrame,text='Search product',width=20,font=('arial',12,'bold'),bg='green',command=lambda :toplevel_data('Search Product','Search Product',search_data))
+searchProductButton = tk.Button(leftFrame,text='Search product by name',width=20,font=('arial',12,'bold'),bg='lime green',command=(search_by_name))
 searchProductButton.grid(row=2,column=0,pady=10)
 
 updateProductButton = tk.Button(leftFrame,text='Update product',width=20,font=('arial',12,'bold'),bg='green',command=lambda :toplevel_data('Update Product','Update Product',update_data))
 updateProductButton.grid(row=3,column=0,pady=10)
 
-showProductButton = tk.Button(leftFrame,text='Show products',width=20,font=('arial',12,'bold'),bg='green',command=show_product)
+showProductButton = tk.Button(leftFrame,text='Show products',width=20,font=('arial',12,'bold'),bg='lime green',command=show_product)
 showProductButton.grid(row=4,column=0,pady=10)
 
 viewProductButton = tk.Button(leftFrame,text='View product',width=20,font=('arial',12,'bold'),bg='green',command=view_product)
 viewProductButton.grid(row=5,column=0,pady=10)
 
-exportDataButton = tk.Button(leftFrame,text='Export data',width=20,font=('arial',12,'bold'),bg='green',command=export_data)
+exportDataButton = tk.Button(leftFrame,text='Export data',width=20,font=('arial',12,'bold'),bg='lime green',command=export_data)
 exportDataButton.grid(row=6,column=0,pady=10)
 
-deleteProductButton = tk.Button(leftFrame,text='Delete product',width=20,font=('arial',12,'bold'),bg='green',command=delete_product)
+deleteProductButton = tk.Button(leftFrame,text='Delete product',width=20,font=('arial',12,'bold'),bg='red',command=delete_product)
 deleteProductButton.grid(row=7,column=0,pady=10)
 
-exitButton = tk.Button(leftFrame,text='Exit',width=20,font=('arial',12,'bold'),bg='green',command=to_exit)
-exitButton.grid(row=8,column=0,pady=10)
+expProdButton = tk.Button(leftFrame,text='Expiring product',width=20,font=('arial',12,'bold'),bg='green',command=expiry_check)
+expProdButton.grid(row=8,column=0,pady=10)
 
+exitButton = tk.Button(leftFrame,text='Check Stock',width=20,font=('arial',12,'bold'),bg='lime green',command=check_stock)
+exitButton.grid(row=9,column=0,pady=10)
+
+# Treeview Frame
 rightFrame = Frame(root)
 rightFrame.place(x=350,y=80,width=1000,height=600)
 
@@ -356,13 +426,13 @@ for i in range(0, len(nameField)):
     productTable.heading(nameField[i],text=nameField[i])
 productTable.config(show='headings')
 
-productTable.column('Product Id',width=100,anchor=CENTER)
-productTable.column('Product Name',width=300,anchor=CENTER)
-productTable.column('Retail Price',anchor=CENTER)
-productTable.column('Wholesales Price',anchor=CENTER)
-productTable.column('Quantity',anchor=CENTER)
-productTable.column('Expiry Date',anchor=CENTER)
-productTable.column('Product Category',anchor=CENTER)
+productTable.column('Product Id',width=90,anchor='w')
+productTable.column('Product Name',width=450,anchor='w')
+productTable.column('Retail Price',anchor='w')
+productTable.column('Wholesales Price',anchor='w')
+productTable.column('Quantity',anchor='w')
+productTable.column('Expiry Date',anchor='w')
+productTable.column('Product Category',anchor='w')
 
 """
 style = ttk.Style()
