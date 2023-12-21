@@ -1,6 +1,6 @@
 from tkinter import *
+import tkinter as tk
 import time
-import ttkthemes
 from tkinter import ttk,messagebox,filedialog
 import sqlite3
 import pandas
@@ -32,30 +32,31 @@ def toplevel_data(title,button_text,command):
         if indexing:
             entryWindow = Toplevel()
             entryWindow.title(title)
-            entryWindow.grab_set()
+            #entryWindow.grab_set()
             entryWindow.resizable(False,False)
-        
-            custNameLabel = Label(entryWindow,text='Name',font=('times new roman',20,'bold'))
+            entryWindow.configure(bg='lightgreen')
+
+            custNameLabel = Label(entryWindow,text='Name',font=('times new roman',20,'bold'),bg='lightgreen')
             custNameLabel.grid(row=0,column=0,padx=30,pady=15,sticky=W)
             custNameEntry = Entry(entryWindow,font=('roman',15,'bold'))
             custNameEntry.grid(row=0,column=1,pady=15,padx=10)
 
-            phoneNoLabel = Label(entryWindow,text='Phone No',font=('times new roman',20,'bold'))
+            phoneNoLabel = Label(entryWindow,text='Phone No',font=('times new roman',20,'bold'),bg='lightgreen')
             phoneNoLabel.grid(row=1,column=0,padx=30,pady=15,sticky=W)
             phoneNoEntry = Entry(entryWindow,font=('roman',15,'bold'))
             phoneNoEntry.grid(row=1,column=1,pady=15,padx=10)
 
-            addressLabel = Label(entryWindow,text='Address',font=('times new roman',20,'bold'))
+            addressLabel = Label(entryWindow,text='Address',font=('times new roman',20,'bold'),bg='lightgreen')
             addressLabel.grid(row=2,column=0,padx=30,pady=15,sticky=W)
             addressEntry = Entry(entryWindow,font=('roman',15,'bold'))
             addressEntry.grid(row=2,column=1,pady=15,padx=10)
 
-            paymentBalLabel = Label(entryWindow,text='Payment Bal',font=('times new roman',20,'bold'))
+            paymentBalLabel = Label(entryWindow,text='Payment Bal',font=('times new roman',20,'bold'),bg='lightgreen')
             paymentBalLabel.grid(row=3,column=0,padx=30,pady=15,sticky=W)
             paymentBalEntry = Entry(entryWindow,font=('roman',15,'bold'))
             paymentBalEntry.grid(row=3,column=1,pady=15,padx=10)
 
-            custButton = ttk.Button(entryWindow,text=button_text,command=command)
+            custButton = tk.Button(entryWindow,text=button_text,font=('roman',15,'bold'),bg='green',command=command)
             custButton.grid(row=4,columnspan=2,pady=10)
 
             content = customerTable.item(indexing)
@@ -72,30 +73,31 @@ def toplevel_data(title,button_text,command):
     if title != 'Update Customer':
         entryWindow = Toplevel()
         entryWindow.title(title)
-        entryWindow.grab_set()
+        #entryWindow.grab_set()
         entryWindow.resizable(False,False)
+        entryWindow.configure(bg='lightgreen')
 
-        custNameLabel = Label(entryWindow,text='Name',font=('times new roman',20,'bold'))
+        custNameLabel = Label(entryWindow,text='Name',font=('times new roman',20,'bold'),bg='lightgreen')
         custNameLabel.grid(row=0,column=0,padx=30,pady=15,sticky=W)
         custNameEntry = Entry(entryWindow,font=('roman',15,'bold'))
         custNameEntry.grid(row=0,column=1,pady=15,padx=10)
 
-        phoneNoLabel = Label(entryWindow,text='Phone No',font=('times new roman',20,'bold'))
+        phoneNoLabel = Label(entryWindow,text='Phone No',font=('times new roman',20,'bold'),bg='lightgreen')
         phoneNoLabel.grid(row=1,column=0,padx=30,pady=15,sticky=W)
         phoneNoEntry = Entry(entryWindow,font=('roman',15,'bold'))
         phoneNoEntry.grid(row=1,column=1,pady=15,padx=10)
 
-        addressLabel = Label(entryWindow,text='Address',font=('times new roman',20,'bold'))
+        addressLabel = Label(entryWindow,text='Address',font=('times new roman',20,'bold'),bg='lightgreen')
         addressLabel.grid(row=2,column=0,padx=30,pady=15,sticky=W)
         addressEntry = Entry(entryWindow,font=('roman',15,'bold'))
         addressEntry.grid(row=2,column=1,pady=15,padx=10)
 
-        paymentBalLabel = Label(entryWindow,text='Payment Balance',font=('times new roman',20,'bold'))
+        paymentBalLabel = Label(entryWindow,text='Payment Balance',font=('times new roman',20,'bold'),bg='lightgreen')
         paymentBalLabel.grid(row=3,column=0,padx=30,pady=15,sticky=W)
         paymentBalEntry = Entry(entryWindow,font=('roman',15,'bold'))
         paymentBalEntry.grid(row=3,column=1,pady=15,padx=10)
 
-        custButton = ttk.Button(entryWindow,text=button_text,command=command)
+        custButton = tk.Button(entryWindow,text=button_text,font=('roman',15,'bold'),bg='green',command=command)
         custButton.grid(row=4,columnspan=2,pady=10)
 
 def add_data():
@@ -124,6 +126,7 @@ def add_data():
         show_data()
             
 def search_data():
+    """
     query = 'SELECT * FROM customer where custName=? or phoneNo=? or address=? or paymentBal=?'
     myCursor.execute(query,(custNameEntry.get(),phoneNoEntry.get(),addressEntry.get(),paymentBalEntry.get()))
     customerTable.delete(*customerTable.get_children())
@@ -132,6 +135,30 @@ def search_data():
         messagebox.showerror('Error', f'No match')
     for data in fetchedData:
         customerTable.insert('',END,values=data)
+    """     
+    def enter():
+        query = 'SELECT * FROM customer WHERE LOWER(custName) LIKE LOWER(?)'
+        myCursor.execute(query,('%'+nameSearchEntry.get()+'%',))
+        customerTable.delete(*customerTable.get_children())
+        fetchedData = myCursor.fetchall()
+        if not fetchedData:
+            messagebox.showerror('Error', f'No match')
+        for data in fetchedData:
+            customerTable.insert('',END,values=data)
+
+    entryWindow = Toplevel()
+    entryWindow.title("Search Customer")
+    #entryWindow.grab_set()
+    entryWindow.resizable(False,False)
+    entryWindow.configure(bg='lightgreen')
+
+    nameSearchLabel = Label(entryWindow,text='Enter name',font=('times new roman',20,'bold'),bg='lightgreen')
+    nameSearchLabel.grid(row=0,column=0,padx=30,pady=15,sticky=W)
+    nameSearchEntry = Entry(entryWindow,font=('roman',15,'bold'))
+    nameSearchEntry.grid(row=0,column=1,pady=15,padx=10)
+
+    enterButton = tk.Button(entryWindow,text='Enter',width=20,font=('arial',12,'bold'),bg='green',command=enter)
+    enterButton.grid(row=1,column=1,pady=15,padx=10)
 
 def delete_data():
     result = messagebox.askyesno('Confirm','Do you want to delete?')
@@ -212,59 +239,53 @@ def clock():
     datetimeLabel.config(text=f'   Date: {date}\nTime: {currentTime}')
     datetimeLabel.after(1000, clock)
 
+#=====================================================================================================
 #Gui part
-root = Toplevel()
-
-#root.get_themes()
-#root.set_theme('radiance')
-
-root.geometry('1174x700+0+0')
+root = tk.Toplevel()
+root.geometry('1174x700')
 root.title('Customers')
 #root.resizable(False,False)
+root.configure(bg='lightgreen')
 
-datetimeLabel = Label(root,font=('times new roman',18,'bold'))
+datetimeLabel = Label(root,font=('times new roman',18,'bold'),fg="green",bg='lightgreen')
 datetimeLabel.place(x=5,y=5)
 clock()
 
 slide = 'Alan Pharmacy and Supermarket'
-sliderLabel = Label(root,font=('aerial',18,'italic bold'),width=50)
+sliderLabel = Label(root,font=('aerial',18,'italic bold'),width=50,fg="green",bg='lightgreen')
 sliderLabel.place(x=200,y=0)
 slider()
 
-#connectButton = ttk.Button(root,text='Connect database',command=connect_database)
-#connectButton.place(x=980,y=0)
-
-leftFrame = Frame(root)
+#Menu frame
+leftFrame = Frame(root,bg='lightgreen')
 leftFrame.place(x=50,y=80,width=300,height=600)
 
 logoImage = PhotoImage(file='images/work.png')
-logoLabel = Label(leftFrame,image=logoImage)
+logoLabel = Label(leftFrame,image=logoImage,bg='lightgreen')
 logoLabel.grid(row=0,column=0)
  
-addCustButton = ttk.Button(leftFrame,text='Add Customer',width=20,command=lambda :toplevel_data('Add Customer','Add Customer',add_data))
+addCustButton = tk.Button(leftFrame,text='Add Customer',width=20,font=('arial',12,'bold'),bg='green',command=lambda :toplevel_data('Add Customer','Add Customer',add_data))
 addCustButton.grid(row=1,column=0,pady=10)
 
-searchCustButton = ttk.Button(leftFrame,text='Search Customer',width=20,command=lambda :toplevel_data('Search Customer','Search Customer',search_data))
+searchCustButton = tk.Button(leftFrame,text='Search Customer',width=20,font=('arial',12,'bold'),bg='lime green',command=search_data)
 searchCustButton.grid(row=2,column=0,pady=10)
 
-updateCustButton = ttk.Button(leftFrame,text='Update Customer',width=20,command=lambda :toplevel_data('Update Customer','Update Customer',update_data))
+updateCustButton = tk.Button(leftFrame,text='Update Customer',width=20,font=('arial',12,'bold'),bg='green',command=lambda :toplevel_data('Update Customer','Update Customer',update_data))
 updateCustButton.grid(row=3,column=0,pady=10)
 
-showCustButton = ttk.Button(leftFrame,text='Show Customer',width=20,command=show_data)
+showCustButton = tk.Button(leftFrame,text='Show Customer',width=20,font=('arial',12,'bold'),bg='lime green',command=show_data)
 showCustButton.grid(row=4,column=0,pady=10)
 
-exportDataButton = ttk.Button(leftFrame,text='Export data',width=20,command=export_data)
+exportDataButton = tk.Button(leftFrame,text='Export data',width=20,font=('arial',12,'bold'),bg='green',command=export_data)
 exportDataButton.grid(row=5,column=0,pady=10)
 
-deleteCustButton = ttk.Button(leftFrame,text='Delete Customer',width=20,command=delete_data)
+deleteCustButton = tk.Button(leftFrame,text='Delete Customer',width=20,font=('arial',12,'bold'),bg='red',command=delete_data)
 deleteCustButton.grid(row=6,column=0,pady=10)
 
-exitButton = ttk.Button(leftFrame,text='Exit',width=20,command=to_exit)
+exitButton = tk.Button(leftFrame,text='Exit',width=20,font=('arial',12,'bold'),bg='green',command=to_exit)
 exitButton.grid(row=7,column=0,pady=10)
 
-backButton = ttk.Button(leftFrame,text='Back',width=20,command=back)
-backButton.grid(row=8,column=0,pady=10)
-
+#Tree view frame
 rightFrame = Frame(root)
 rightFrame.place(x=350,y=80,width=1000,height=600)
 
@@ -286,15 +307,16 @@ for i in range(0, len(nameField)):
     customerTable.heading(nameField[i],text=nameField[i])
 customerTable.config(show='headings')
 
-customerTable.column('Id',width=100,anchor=CENTER)
-customerTable.column('Name',width=300,anchor=CENTER)
-customerTable.column('Phone No',width=200,anchor=CENTER)
-customerTable.column('Address',width=500,anchor=CENTER)
-customerTable.column('Payment Balance',width=200,anchor=CENTER)
+customerTable.column('Id',width=100,anchor='w')
+customerTable.column('Name',width=400,anchor='w')
+customerTable.column('Phone No',width=200,anchor='w')
+customerTable.column('Address',width=400,anchor='w')
+customerTable.column('Payment Balance',width=200,anchor='w')
 
-style = ttk.Style()
-style.configure('Treeview',rowheight=25,font=('arial',12,'bold'),
-                foreground='green',background='black',fieldbackground='green')
-style.configure('Treeview.Heading',font=('arial',14,'bold'),foreground='green')
+style = ttk.Style(rightFrame)
+style.theme_use("clam") # set theme to clam
+style.configure("Treeview", background="azure2", 
+                fieldbackground="lightyellow", foreground="black",font='black')
+style.configure('Treeview.Heading', background="lime green")
 
 root.mainloop()

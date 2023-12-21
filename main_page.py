@@ -27,8 +27,8 @@ def switch():
 
         # resetting widget colors:
         brandLabel.config(bg="gray17", fg="green")
-        homeLabel.config(bg=color["lime green"])
-        topFrame.config(bg=color["lime green"])
+        homeLabel.config(bg=color["nero"])
+        topFrame.config(bg=color["nero"])
         root.config(bg="gray17")
 
         # turning button OFF:
@@ -119,15 +119,7 @@ tk.Label(navRoot, font="Bahnschrift 15", bg='sky blue', fg="black", height=2, wi
 
 # set y-coordinate of Navbar widgets:
 #y = 80
-"""
-# option in the navbar:
-options = ["inventory", "Settings", "Help", "About", "Feedback"]
-# Navbar Option Buttons:
-for i in range(5):
-    tk.Button(navRoot, text=options[i], font="BahnschriftLight 15", bg="gray17", fg=color["lime green"], activebackground="gray17",
-            activeforeground="green", bd=0).place(x=25, y=y)
-    y += 40
-"""
+
 invoiceButton = tk.Button(navRoot, text="Sales Management", font="BahnschriftLight 15", bg="gray17", fg=color["lime green"], activebackground="gray17",
             activeforeground="green", bd=0, command=invoice).place(x=25, y=80)
 inventoryButton = tk.Button(navRoot, text="Inventory Management", font="BahnschriftLight 15", bg="gray17", fg=color["lime green"], activebackground="gray17",
@@ -144,9 +136,6 @@ supplierButton = tk.Button(navRoot, text="Supplier Management", font="Bahnschrif
 # Navbar Close Button:
 closeBtn = tk.Button(navRoot, image=closeIcon, bg=color["lime green"], activebackground=color["lime green"], bd=0, command=switch)
 closeBtn.place(x=250, y=10)
-
-#global username, password
-#username = 'Alan Pharmacy'
 
 loginFrame = Frame(root,bg='#c8dae0')
 loginFrame.place(x=400, y=150)

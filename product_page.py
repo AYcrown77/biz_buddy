@@ -163,7 +163,7 @@ def add_data():
 def search_by_name():
     def enter():
         query = 'SELECT * FROM products WHERE LOWER(productName) LIKE LOWER(?)'
-        myCursor.execute(query, ('%' + nameSearchEntry.get()+ '%',))
+        myCursor.execute(query, ('%'+nameSearchEntry.get()+'%',))
         productTable.delete(*productTable.get_children())
         fetchedData = myCursor.fetchall()
         if not fetchedData:

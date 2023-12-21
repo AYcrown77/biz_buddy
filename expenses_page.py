@@ -225,9 +225,7 @@ sliderLabel = Label(root,font=('aerial',18,'italic bold'),width=50,fg="green",bg
 sliderLabel.place(x=200,y=0)
 slider()
 
-#connectButton = ttk.Button(root,text='Connect database',command=connect_database)
-#connectButton.place(x=980,y=0)
-
+#Menu frame
 leftFrame = Frame(root,bg='lightgreen')
 leftFrame.place(x=50,y=80,width=300,height=600)
 

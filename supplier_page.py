@@ -1,4 +1,5 @@
 from tkinter import *
+import tkinter as tk
 import time
 from tkinter import ttk,messagebox,filedialog
 import sqlite3
@@ -30,26 +31,27 @@ def toplevel_data(title,button_text,command):
         if indexing:
             entryWindow = Toplevel()
             entryWindow.title(title)
-            entryWindow.grab_set()
+            #entryWindow.grab_set()
             entryWindow.resizable(False,False)
-        
-            supNameLabel = Label(entryWindow,text='Name',font=('times new roman',20,'bold'))
+            entryWindow.configure(bg='lightgreen')
+
+            supNameLabel = Label(entryWindow,text='Name',font=('times new roman',20,'bold'),bg='lightgreen')
             supNameLabel.grid(row=0,column=0,padx=30,pady=15,sticky=W)
             supNameEntry = Entry(entryWindow,font=('roman',15,'bold'))
             supNameEntry.grid(row=0,column=1,pady=15,padx=10)
 
-            phoneNoLabel = Label(entryWindow,text='Phone No',font=('times new roman',20,'bold'))
+            phoneNoLabel = Label(entryWindow,text='Phone No',font=('times new roman',20,'bold'),bg='lightgreen')
             phoneNoLabel.grid(row=1,column=0,padx=30,pady=15,sticky=W)
             phoneNoEntry = Entry(entryWindow,font=('roman',15,'bold'))
             phoneNoEntry.grid(row=1,column=1,pady=15,padx=10)
 
-            addressLabel = Label(entryWindow,text='Address',font=('times new roman',20,'bold'))
+            addressLabel = Label(entryWindow,text='Address',font=('times new roman',20,'bold'),bg='lightgreen')
             addressLabel.grid(row=2,column=0,padx=30,pady=15,sticky=W)
             addressEntry = Entry(entryWindow,font=('roman',15,'bold'))
             addressEntry.grid(row=2,column=1,pady=15,padx=10)
 
-            supButton = ttk.Button(entryWindow,text=button_text,command=command)
-            supButton.grid(row=6,columnspan=2,pady=10)
+            supButton = tk.Button(entryWindow,text=button_text,font=('roman',15,'bold'),bg='green',command=command)
+            supButton.grid(row=3,columnspan=2,pady=10)
 
             content = supplierTable.item(indexing)
             listData = content['values']
@@ -61,29 +63,30 @@ def toplevel_data(title,button_text,command):
             messagebox.showerror('Error', f'No supplier selected')
             return
 
-    if title != 'Update Supplier':
+    if title == 'Add Supplier':
         entryWindow = Toplevel()
         entryWindow.title(title)
-        entryWindow.grab_set()
+        #entryWindow.grab_set()
         entryWindow.resizable(False,False)
+        entryWindow.configure(bg='lightgreen')
 
-        supNameLabel = Label(entryWindow,text='Name',font=('times new roman',20,'bold'))
+        supNameLabel = Label(entryWindow,text='Name',font=('times new roman',20,'bold'),bg='lightgreen')
         supNameLabel.grid(row=0,column=0,padx=30,pady=15,sticky=W)
         supNameEntry = Entry(entryWindow,font=('roman',15,'bold'))
         supNameEntry.grid(row=0,column=1,pady=15,padx=10)
 
-        phoneNoLabel = Label(entryWindow,text='Phone No',font=('times new roman',20,'bold'))
+        phoneNoLabel = Label(entryWindow,text='Phone No',font=('times new roman',20,'bold'),bg='lightgreen')
         phoneNoLabel.grid(row=1,column=0,padx=30,pady=15,sticky=W)
         phoneNoEntry = Entry(entryWindow,font=('roman',15,'bold'))
         phoneNoEntry.grid(row=1,column=1,pady=15,padx=10)
 
-        addressLabel = Label(entryWindow,text='Address',font=('times new roman',20,'bold'))
+        addressLabel = Label(entryWindow,text='Address',font=('times new roman',20,'bold'),bg='lightgreen')
         addressLabel.grid(row=2,column=0,padx=30,pady=15,sticky=W)
         addressEntry = Entry(entryWindow,font=('roman',15,'bold'))
         addressEntry.grid(row=2,column=1,pady=15,padx=10)
 
-        supButton = ttk.Button(entryWindow,text=button_text,command=command)
-        supButton.grid(row=6,columnspan=2,pady=10)
+        supButton = tk.Button(entryWindow,text=button_text,font=('roman',15,'bold'),bg='green',command=command)
+        supButton.grid(row=3,columnspan=2,pady=10)
 
 def add_data():
     if supNameEntry.get()=='' or phoneNoEntry.get()=='' or addressEntry.get()=='':
@@ -110,14 +113,29 @@ def add_data():
         show_data()
             
 def search_data():
-    query = 'SELECT * FROM supplier WHERE supName=? or phoneNo=? or address=?'
-    myCursor.execute(query,(supNameEntry.get(),phoneNoEntry.get(),addressEntry.get()))
-    supplierTable.delete(*supplierTable.get_children())
-    fetchedData = myCursor.fetchall()
-    if not fetchedData:
-        messagebox.showerror('Error', f'No match')
-    for data in fetchedData:
-        supplierTable.insert('',END,values=data)
+    def enter():
+        query = 'SELECT * FROM supplier WHERE LOWER(supName) LIKE LOWER(?)'
+        myCursor.execute(query,('%' + nameSearchEntry.get()+ '%',))
+        supplierTable.delete(*supplierTable.get_children())
+        fetchedData = myCursor.fetchall()
+        if not fetchedData:
+            messagebox.showerror('Error', f'No match')
+        for data in fetchedData:
+            supplierTable.insert('',END,values=data)
+
+    entryWindow = Toplevel()
+    entryWindow.title("Search Supplier")
+    #entryWindow.grab_set()
+    entryWindow.resizable(False,False)
+    entryWindow.configure(bg='lightgreen')
+
+    nameSearchLabel = Label(entryWindow,text='Enter name',font=('times new roman',20,'bold'),bg='lightgreen')
+    nameSearchLabel.grid(row=0,column=0,padx=30,pady=15,sticky=W)
+    nameSearchEntry = Entry(entryWindow,font=('roman',15,'bold'))
+    nameSearchEntry.grid(row=0,column=1,pady=15,padx=10)
+
+    enterButton = tk.Button(entryWindow,text='Enter',width=20,font=('arial',12,'bold'),bg='green',command=enter)
+    enterButton.grid(row=1,column=1,pady=15,padx=10)
 
 def delete_data():
     result = messagebox.askyesno('Confirm','Do you want to delete?')
@@ -198,59 +216,52 @@ def clock():
     datetimeLabel.config(text=f'   Date: {date}\nTime: {currentTime}')
     datetimeLabel.after(1000, clock)
 
+#====================================================================================================
 #Gui part
-root = Toplevel()
-
-#root.get_themes()
-#root.set_theme('radiance')
-
-root.geometry('1174x700+0+0')
+root = tk.Toplevel()
+root.geometry('1174x700')
 root.title('Suppliers')
-#root.resizable(False,False)
+root.configure(bg='lightgreen')
 
-datetimeLabel = Label(root,font=('times new roman',18,'bold'))
+datetimeLabel = Label(root,font=('times new roman',18,'bold'),fg="green",bg='lightgreen')
 datetimeLabel.place(x=5,y=5)
 clock()
 
 slide = 'Alan Pharmacy and Supermarket'
-sliderLabel = Label(root,font=('aerial',18,'italic bold'),width=50)
+sliderLabel = Label(root,font=('aerial',18,'italic bold'),width=50,fg="green",bg='lightgreen')
 sliderLabel.place(x=200,y=0)
 slider()
 
-#connectButton = ttk.Button(root,text='Connect database',command=connect_database)
-#connectButton.place(x=980,y=0)
-
-leftFrame = Frame(root)
+#Menu frame
+leftFrame = Frame(root,bg='lightgreen')
 leftFrame.place(x=50,y=80,width=300,height=600)
 
 logoImage = PhotoImage(file='images/work.png')
-logoLabel = Label(leftFrame,image=logoImage)
+logoLabel = Label(leftFrame,image=logoImage,bg='lightgreen')
 logoLabel.grid(row=0,column=0)
  
-addSupButton = ttk.Button(leftFrame,text='Add Supplier',width=20,command=lambda :toplevel_data('Add Supplier','Add Supplier',add_data))
+addSupButton = tk.Button(leftFrame,text='Add Supplier',width=20,font=('arial',12,'bold'),bg='green',command=lambda :toplevel_data('Add Supplier','Add Supplier',add_data))
 addSupButton.grid(row=1,column=0,pady=10)
 
-searchSupButton = ttk.Button(leftFrame,text='Search Supplier',width=20,command=lambda :toplevel_data('Search Supplier','Search Supplier',search_data))
+searchSupButton = tk.Button(leftFrame,text='Search Supplier',width=20,font=('arial',12,'bold'),bg='lime green',command=search_data)
 searchSupButton.grid(row=2,column=0,pady=10)
 
-updateSupButton = ttk.Button(leftFrame,text='Update Supplier',width=20,command=lambda :toplevel_data('Update Supplier','Update Supplier',update_data))
+updateSupButton = tk.Button(leftFrame,text='Update Supplier',width=20,font=('arial',12,'bold'),bg='green',command=lambda :toplevel_data('Update Supplier','Update Supplier',update_data))
 updateSupButton.grid(row=3,column=0,pady=10)
 
-showSupButton = ttk.Button(leftFrame,text='Show Supplier',width=20,command=show_data)
+showSupButton = tk.Button(leftFrame,text='Show Supplier',width=20,font=('arial',12,'bold'),bg='lime green',command=show_data)
 showSupButton.grid(row=4,column=0,pady=10)
 
-exportDataButton = ttk.Button(leftFrame,text='Export data',width=20,command=export_data)
+exportDataButton = tk.Button(leftFrame,text='Export data',width=20,font=('arial',12,'bold'),bg='green',command=export_data)
 exportDataButton.grid(row=5,column=0,pady=10)
 
-deleteSupButton = ttk.Button(leftFrame,text='Delete Supplier',width=20,command=delete_data)
+deleteSupButton = tk.Button(leftFrame,text='Delete Supplier',width=20,font=('arial',12,'bold'),bg='red',command=delete_data)
 deleteSupButton.grid(row=6,column=0,pady=10)
 
-exitButton = ttk.Button(leftFrame,text='Exit',width=20,command=to_exit)
+exitButton = tk.Button(leftFrame,text='Exit',width=20,font=('arial',12,'bold'),bg='lime green',command=to_exit)
 exitButton.grid(row=7,column=0,pady=10)
 
-backButton = ttk.Button(leftFrame,text='Back',width=20,command=back)
-backButton.grid(row=8,column=0,pady=10)
-
+#Tree view frame
 rightFrame = Frame(root)
 rightFrame.place(x=350,y=80,width=1000,height=600)
 
@@ -272,14 +283,15 @@ for i in range(0, len(nameField)):
     supplierTable.heading(nameField[i],text=nameField[i])
 supplierTable.config(show='headings')
 
-supplierTable.column('Id',width=50,anchor=CENTER)
-supplierTable.column('Name',width=300,anchor=CENTER)
-supplierTable.column('Phone No',width=100,anchor=CENTER)
-supplierTable.column('Address',width=500,anchor=CENTER)
+supplierTable.column('Id',width=50,anchor='w')
+supplierTable.column('Name',width=300,anchor='w')
+supplierTable.column('Phone No',width=200,anchor='w')
+supplierTable.column('Address',width=500,anchor='w')
 
-style = ttk.Style()
-style.configure('Treeview',rowheight=25,font=('arial',12,'bold'),
-                foreground='green',background='black',fieldbackground='green')
-style.configure('Treeview.Heading',font=('arial',14,'bold'),foreground='green')
+style = ttk.Style(rightFrame)
+style.theme_use("clam") # set theme to clam
+style.configure("Treeview", background="azure2", 
+                fieldbackground="lightyellow", foreground="black",font='black')
+style.configure('Treeview.Heading', background="lime green")
 
 root.mainloop()
