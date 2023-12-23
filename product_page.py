@@ -82,6 +82,7 @@ def toplevel_data(title,button_text,command):
             retailPriceEntry.insert(0,listData[2])
             wholesalesPriceEntry.insert(0,listData[3])
             quantityEntry.insert(0,listData[4])
+            expiryDateEntry.delete(0, tk.END)
             expiryDateEntry.insert(0,listData[5])
             productCategoryEntry.insert(0,listData[6])
         else:
