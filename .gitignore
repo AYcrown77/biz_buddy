@@ -2,3 +2,4 @@
 __pycache__/
 bills/
 procBills/
+build/
