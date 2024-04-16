@@ -12,6 +12,7 @@ def login():
     elif usernameEntry.get()=='Alan Pharmacy' and passwordEntry.get()=='1234':
         messagebox.showinfo('Success', 'Successful')
         switch()
+        #import invoice_page
         passwordEntry.delete(0, tk.END)
     else:
         messagebox.showerror('Error', 'Enter correct credentials')
@@ -70,7 +71,7 @@ def supplier():
 #====================================================================================================
 
 root = tk.Tk()
-root.geometry('1360x750')
+root.geometry('1300x750')
 root.title('Main page')
 root.resizable(False, False)
 #root.state('zoomed')

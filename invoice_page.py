@@ -43,8 +43,9 @@ def on_select(event):
 
 # Functionality part of invoice/bill frame
 def clear_text():
-    messagebox.askyesno('Confirm', 'Are you sure you want to clear text?')
-    textArea.delete(1.0,END)
+    result = messagebox.askyesno('Confirm', 'Are you sure you want to clear text?')
+    if result:
+        textArea.delete(1.0,END)
 
 def print_bill():
     if textArea.get(1.0,END)=='\n':
@@ -79,34 +80,38 @@ def search_bill():
         messagebox.showerror('Error','Invalid Bill Number')
 
 def bill_area():
-    global billNumber
-    billNumber = str(inv_id)
+    global billNumber,newToday
     todayDate = time.strftime('%d/%m/%Y')
+    newToday = todayDate.replace("/", "")
     currentTime = time.strftime('%H:%M:%S')
+    billNumber = str(inv_id)
     textArea.delete(1.0,END)
     if total == 0:
         messagebox.showerror('Error','No product purchased')
     else:
-        textArea.insert(END,'\t  **ALAN PHAMACEUTICALS(NIG) LTD.**')
-        textArea.insert(END,'\n    Opp. Iwo city hall, Ibadan road, Iwo, Osun state.')
-        textArea.insert(END,'\n\t\t    08035896001')
-        textArea.insert(END,'\n')
+        textArea.insert(END,'**ALAN PHARMACY NIG LTD.**')
+        #textArea.insert(END,'\nOpp. Iwo city hall, Ibadan road, Iwo, Osun state.')
+        textArea.insert(END,'\n\t08035896001')
+        #textArea.insert(END,'\n')
         textArea.insert(END,f'\nDate: {todayDate} {currentTime}')
-        textArea.insert(END,f'\nReciept Number: {billNumber}')
+        textArea.insert(END,f'\nReciept Number: {billNumber}-{newToday}')
         textArea.insert(END,f'\nCustomer: {name_cb.get()}')
         textArea.insert(END,f'\nPayment Method: {paymentEntry.get()}')
-        textArea.insert(END,'\n=======================================================')
-        textArea.insert(END,'\nProduct\t\t\t\tQty\t\tPrice')
-        textArea.insert(END,'\n=======================================================')
+        textArea.insert(END,'\n===================================')
+        #textArea.insert(END,'\nProduct\t\t\t\tQty\t\tPrice')
+        #textArea.insert(END,'\n========================================')
         for line in trv.get_children():
             my_lst = trv.item(line)['values']
-            textArea.insert(END,f'\n{my_lst[0]}\t\t\t\t{my_lst[1]}\t\t{my_lst[3]}')
-        textArea.insert(END,'\n=======================================================')
-        textArea.insert(END,f'\n\t\t\t\t\t\t\t\t\t\t\tSub total: #{sub_total:,}')
-        textArea.insert(END,f'\n\t\t\t\t\t\t\t\t\t\t\tOutstanding: #{outstanding_bal:,}')
-        textArea.insert(END,f'\n\t\t\t\t\t\t\t\t\t\t\tTOTAL: #{total:,}')
+            #textArea.insert(END,f'\n{my_lst[0]}\t\t\t\t{my_lst[1]}\t\t{my_lst[3]}')
+            textArea.insert(END,f'\n{my_lst[0]}')
+            textArea.insert(END,f'\n{my_lst[1]}\t\t\t{my_lst[3]}')
+        textArea.insert(END,'\n====================================')
+        textArea.insert(END,f'\nSub total: #{sub_total:,}')
+        textArea.insert(END,f'\nOutstanding: #{outstanding_bal:,}')
+        textArea.insert(END,f'\nTOTAL: #{total:,}')
         #textArea.insert(END,'\n=======================================================')
-        textArea.insert(END,'\n\n\t\t**Thanks for your patronage**')
+        textArea.insert(END,'\n')
+        textArea.insert(END,'\n**Thanks for your patronage**')
         save_bill()
 
 def save_bill():
@@ -115,7 +120,7 @@ def save_bill():
     #result = messagebox.askyesno('Confirm','Do you want to save the bill?' )
     else:
         bill_content = textArea.get(1.0,END)
-        file = open(f'bills/{billNumber}.txt','w')
+        file = open(f'bills/{billNumber}-{newToday}.txt','w')
         file.write(bill_content)
         file.close()
         messagebox.showinfo('Success', f'Bill number {billNumber} saved succefully')
@@ -147,15 +152,27 @@ def my_price(*args):  # *args is used to pass any number of arguments
             cb_price['values'] = both
             p_id = j[0]  # Product id is collected
 
+def my_qty():  # *args is used to pass any number of arguments
+    for i, j in my_dict.items():  # Loop through the dictionary of products
+        if j[1] == product.get():  # match the product name
+            qty_in_stk = j[4]
+            if qty_in_stk <= 0:
+                messagebox.showerror('Error','Product Out Of Stock')
+
 #Add new data to the treeview
 def my_add():
     if cb_product.get() == '':
         messagebox.showerror('Error','No product selected')
-    else:
-        total = round(qty.get()*prc.get(),2) # row wise total 
-        trv.insert("", 'end',values =(product.get(),qty.get(),prc.get(),total))
-        #change_qty()
-        my_upd(trv)
+    for i, j in my_dict.items():  # Loop through the dictionary of products
+        if j[1] == product.get():  # match the product name
+            qty_in_stk = j[4]
+            if qty_in_stk <= 0:
+                messagebox.showerror('Error','Product Out Of Stock')
+            else:
+                total = round(qty.get()*prc.get(),2) # row wise total 
+                trv.insert("", 'end',values =(product.get(),qty.get(),prc.get(),total))
+                #change_qty()
+                my_upd(trv)
 
 #Change product quantity
 def change_qty():
@@ -459,7 +476,7 @@ trv.grid(columnspan=10,rowspan=2,padx=10,pady=2)
 
 # Create vertical scrollbar
 vbar = ttk.Scrollbar(leftFrame, orient="vertical", command=trv.yview)
-vbar.grid(row=1, rowspan=3, column=6, sticky="ns")
+vbar.grid(row=1, rowspan=3, column=8, sticky="ns")
 
 # Configure treeview to use the vertical scrollbar
 trv.configure(yscrollcommand=vbar.set)
